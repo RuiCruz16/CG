@@ -1,12 +1,9 @@
 # CG 2024/2025
 
-## Group T0xG0y
+## Group T13G08
 
 ## TP 1 Notes
 
-(add your main observations/remarks about your experiments here, in a bulleted list, and remove this line. Some examples below)
+- In exercise 1 and 2 we were able to understant the basis of CGF library and how the order that the vertices appear work.
 
-- In exercise 1 we observed X
-- In exercise 2 we had difficulties in Y
-
-![Screenshot 1](screenshots/cg-t0xgxx-tp1-n.png)
+![Screenshot 1](screenshots/CG-t13g08-tp1-1.png)
