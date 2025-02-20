@@ -3,8 +3,8 @@
 ## Group T0xG0y
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
-| John Doe         | 201901010 | ...                |
-| Jane Doe         | 201901011 | ...                |
+| Miguel Guerrinha | 202205038 | up202205038@up.pt  |
+| Rui Cruz         | 202208011 | up202208011@up.pt  |
 
 ----
 
