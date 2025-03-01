@@ -1,6 +1,6 @@
 # CG 2024/2025
 
-## Group T0xG0y
+## Group T13G08
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
 | Miguel Guerrinha | 202205038 | up202205038@up.pt  |
