@@ -29,6 +29,9 @@ export class MyInterface extends CGFinterface {
         //Checkbox element in GUI
         this.gui.add(this.scene, 'displayCube').name('Cube');
 
+        //Checkbox element in GUI
+        this.gui.add(this.scene, 'displayCubeQuad').name('CubeQuad');
+
         return true;
     }
 }
