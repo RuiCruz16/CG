@@ -25,10 +25,11 @@ export class MyCylinder extends CGFobject {
           for (let i = 0; i < this.slices; i++) {
               let x = Math.cos(i * angle);
               let y = Math.sin(i * angle);
-              
+              let sizeNormal = Math.sqrt(x * x + y * y);
+
               this.vertices.push(x, y, z);
               
-              this.normals.push(x, y, 0);
+              this.normals.push(x/sizeNormal, y/sizeNormal, 0);
           }
         }
 
