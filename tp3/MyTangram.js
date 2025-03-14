@@ -44,7 +44,7 @@ export class MyTangram extends CGFobject {
         this.triangleSmallMaterial1.setSpecular(0.9, 0.9, 0.9, 1.0);
         this.triangleSmallMaterial1.setShininess(10.0);
 
-        // Red Small Triangle Material
+        // Purple Small Triangle Material
         this.triangleSmallMaterial2 = new CGFappearance(this.scene);
         this.triangleSmallMaterial2.setAmbient(1, 0, 0, 1.0);
         this.triangleSmallMaterial2.setDiffuse(153/255, 50/255, 204/255, 0);
