@@ -1,6 +1,7 @@
 import { CGFscene, CGFcamera, CGFaxis, CGFtexture, CGFappearance } from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MySphere } from "./MySphere.js";
+import { MyPanorama } from "./MyPanorama.js";
 
 /**
  * MyScene
@@ -52,6 +53,7 @@ export class MyScene extends CGFscene {
     this.axis = new CGFaxis(this, 20, 1);
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
+    this.panorama = new MyPanorama(this, 'images/panorama.jpg'); // assuming you move panorama.jpg to images/
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -61,7 +63,7 @@ export class MyScene extends CGFscene {
   }
   initCameras() {
     this.camera = new CGFcamera(
-      0.4,
+      Math.PI / 3,
       0.1,
       1000,
       vec3.fromValues(200, 200, 200),
@@ -111,7 +113,8 @@ export class MyScene extends CGFscene {
     this.axis.display();
 
     this.setDefaultAppearance();
-
+    
+    /*
     this.pushMatrix();
       this.scale(400, 1, 400);
       this.rotate(-Math.PI / 2, 1, 0, 0);
@@ -119,14 +122,15 @@ export class MyScene extends CGFscene {
       this.planeMaterial.apply(); // Apply the texture to the plane!
       this.plane.display();
     this.popMatrix();
+    */
 
     this.pushMatrix();
-      this.translate(0, 100, 0);
-      this.scale(50, 50, 50);
       this.rotate(-Math.PI / 2, 1, 0, 0)
       this.earthMaterial.apply(); // Apply the texture to the sphere!
       this.sphere.display();
     this.popMatrix();
+
+    this.panorama.display(); // Display the panorama
 
 
   }
