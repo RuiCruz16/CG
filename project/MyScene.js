@@ -2,6 +2,7 @@ import { CGFscene, CGFcamera, CGFaxis, CGFtexture, CGFappearance } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MySphere } from "./MySphere.js";
 import { MyPanorama } from "./MyPanorama.js";
+import { MyBuilding } from './MyBuilding.js';
 
 /**
  * MyScene
@@ -42,10 +43,8 @@ export class MyScene extends CGFscene {
     this.earthMaterial.setShininess(10.0);
     this.earthMaterial.loadTexture('images/earth.jpg');
 
-
     // Textures
     this.textureGrass =  new CGFtexture(this, 'images/grass.png'); 
-
 
     this.setUpdatePeriod(50);
 
@@ -54,6 +53,7 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
+    this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -113,15 +113,17 @@ export class MyScene extends CGFscene {
     this.axis.display();
 
     this.setDefaultAppearance();
-    
-    
+
+    this.pushMatrix();
+      this.building.display();
+    this.popMatrix();
+
     this.pushMatrix();
       this.scale(400, 1, 400);
       this.rotate(-Math.PI / 2, 1, 0, 0);
       this.planeMaterial.apply(); // Apply the texture to the plane!
       this.plane.display();
     this.popMatrix();
-    
 
     this.pushMatrix();
       this.earthMaterial.apply(); // Apply the texture to the sphere!
@@ -129,7 +131,6 @@ export class MyScene extends CGFscene {
     this.popMatrix();
 
     this.panorama.display(); // Display the panorama
-
 
   }
 }
