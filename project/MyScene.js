@@ -55,7 +55,7 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
-    this.tree = new MyTree(this, 15, 3, 5, 5);
+    this.tree = new MyTree(this, 15, 3, 0, 'y', [1.0, 1.0, 0.0]);
 
 
   }

@@ -19,7 +19,13 @@ export class MyTree extends CGFobject {
     this.trunkRadius = trunkRadius;
     this.tiltAngle = tiltAngle;
     this.rotationAxis = rotationAxis;
-    this.color = color;
+    // Validate color parameter
+    if (!Array.isArray(color) || color.length < 3) {
+        console.warn("Invalid color provided for MyTree. Using default green color.");
+        this.color = [0.0, 1.0, 0.0]; // Default to green
+    } else {
+        this.color = color;
+    }    
     this.initBuffers();
   }
 
@@ -37,7 +43,7 @@ export class MyTree extends CGFobject {
     let pyramidHeight = treetop / numPyramids; // Adjust height based on number of pyramids
     let pyramidBaseSize = this.trunkRadius * 2; // Base size of the pyramid
     this.pyramidMaterial = new CGFappearance(this.scene);
-    this.pyramidMaterial.setDiffuse(0.0, 1.0, 0.0, 1);  // Green color for foliage
+    this.pyramidMaterial.setDiffuse(this.color[0], this.color[1], this.color[2], 1);  // Green color for foliage
 
     // Create multiple pyramids for the crown
     for (let i = 0; i < numPyramids; i++) {
