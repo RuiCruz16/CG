@@ -17,6 +17,7 @@ export class MyPanorama {
         this.scene.pushMatrix();
         let pos = this.scene.camera.position;
         this.scene.translate(pos[0], pos[1], pos[2]);
+        this.scene.rotate(-Math.PI/2, 1, 0, 0);
         this.scene.scale(200, 200, 200);
         this.sphere.display();
         this.scene.popMatrix();
