@@ -31,9 +31,14 @@ export class MyTree extends CGFobject {
 
   initBuffers() {
     // Tree trunk (cone)
-    this.trunk = new MyCone(this.scene, 20, 1, this.trunkHeight, this.trunkRadius); // 20 slices, 1 stack
+    this.trunk = new MyCone(this.scene, 20, 1, this.trunkHeight, this.trunkRadius);
     this.trunkMaterial = new CGFappearance(this.scene);
-    this.trunkMaterial.setDiffuse(0.5, 0.25, 0.1, 1);  // Brown color for trunk
+    this.trunkMaterial.setAmbient(0.5, 0.25, 0.1, 1);
+    this.trunkMaterial.setDiffuse(0.5, 0.25, 0.1, 1);
+    this.trunkMaterial.setSpecular(0.1, 0.1, 0.1, 1);
+    this.trunkMaterial.setShininess(10.0);
+    this.trunkMaterial.loadTexture('images/trunk.jpg');
+    this.trunkMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
     // Tree crown (pyramids)
     this.pyramids = [];
@@ -43,12 +48,17 @@ export class MyTree extends CGFobject {
     let pyramidHeight = treetop / numPyramids; // Adjust height based on number of pyramids
     let pyramidBaseSize = this.trunkRadius * 2; // Base size of the pyramid
     this.pyramidMaterial = new CGFappearance(this.scene);
-    this.pyramidMaterial.setDiffuse(this.color[0], this.color[1], this.color[2], 1);  // Green color for foliage
+    this.pyramidMaterial.setAmbient(this.color[0], this.color[1], this.color[2], 1);
+    this.pyramidMaterial.setDiffuse(this.color[0], this.color[1], this.color[2], 1);
+    this.pyramidMaterial.setSpecular(0.1, 0.1, 0.1, 1);
+    this.pyramidMaterial.setShininess(10.0);
+    this.pyramidMaterial.loadTexture('images/leaf.jpg');
+    this.pyramidMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
     // Create multiple pyramids for the crown
     for (let i = 0; i < numPyramids; i++) {
-    this.pyramids.push(new MyPyramid(this.scene, 6, pyramidHeight, pyramidBaseSize));
-    pyramidBaseSize *= 0.9;
+        this.pyramids.push(new MyPyramid(this.scene, 6, pyramidHeight, pyramidBaseSize));
+        pyramidBaseSize *= 0.9;
     }
 
     this.numPyramids = numPyramids;
@@ -58,6 +68,14 @@ export class MyTree extends CGFobject {
   }
 
   display() {
+    // Apply tilt transformation
+    this.scene.pushMatrix();
+        if (this.rotationAxis === 'x') {
+            this.scene.rotate(this.tiltAngle, 1, 0, 0); 
+        } else if (this.rotationAxis === 'z') {
+            this.scene.rotate(this.tiltAngle, 0, 0, 1); // Tilt around the Z-axis
+        }
+
     // Draw the trunk (cone)
     this.scene.pushMatrix();
         this.trunkMaterial.apply();
@@ -78,5 +96,6 @@ export class MyTree extends CGFobject {
       // Move the next pyramid higher up
       yOffset += this.pyramidHeight;
     }
+    this.scene.popMatrix(); // Pop the tilt transformation
   }
 }

@@ -3,6 +3,7 @@ import { MyPlane } from "./MyPlane.js";
 import { MySphere } from "./MySphere.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./MyTree.js";
+import { MyForest } from "./MyForest.js";
 
 /**
  * MyScene
@@ -55,7 +56,8 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
-    this.tree = new MyTree(this, 15, 3, 0, 'y', [1.0, 1.0, 0.0]);
+    this.tree = new MyTree(this, 30, 5, Math.PI/4, 'z', [0.0, 1.0, 0.0]);
+    this.forest = new MyForest(this, 4, 4); 
 
 
   }
@@ -114,13 +116,16 @@ export class MyScene extends CGFscene {
     this.applyViewMatrix();
 
     // Draw axis
-    this.axis.display();
+    //this.axis.display();
 
     this.setDefaultAppearance();
 
-    
     this.pushMatrix();
-      this.tree.display(); // Display the tree
+      this.forest.display(); // Display the forest of trees
+    this.popMatrix();
+
+    this.pushMatrix();
+      //this.tree.display(); // Display the tree
     this.popMatrix();
       
     this.pushMatrix();
@@ -133,7 +138,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
       this.earthMaterial.apply(); // Apply the texture to the sphere!
-      this.sphere.display();
+      //this.sphere.display();
     this.popMatrix();
 
     this.panorama.display(); // Display the panorama

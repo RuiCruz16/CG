@@ -23,6 +23,7 @@ export class MyCone extends CGFobject {
         this.vertices = [];
         this.indices = [];
         this.normals = [];
+        this.texCoords = [];
     
         var ang = 0;
         var alphaAng = 2 * Math.PI / this.slices;
@@ -40,7 +41,8 @@ export class MyCone extends CGFobject {
                 var y = currentHeight;
     
                 this.vertices.push(x, y, z);
-                this.normals.push(x, 0.707, z);  // Normals pointing at the cone apex
+                this.normals.push(x, 0.707, z);
+                this.texCoords.push(j / this.slices, i / this.stacks);
                 ang += alphaAng;
             }
         }
@@ -48,6 +50,7 @@ export class MyCone extends CGFobject {
         // Add the cone's apex
         this.vertices.push(0, this.height, 0);
         this.normals.push(0, 1, 0);
+        this.texCoords.push(0.5, 1);
     
         // Create the cone's faces
         for (var i = 0; i < this.stacks; i++) {
@@ -63,8 +66,8 @@ export class MyCone extends CGFobject {
     
         // Add the base of the cone
         var baseCenterIndex = this.vertices.length / 3;
-        this.vertices.push(0, 0, 0);  // Center of the base
-        this.normals.push(0, -1, 0);  // Normal pointing downwards
+        this.vertices.push(0, 0, 0);
+        this.normals.push(0, -1, 0);
     
         ang = 0;
         for (var j = 0; j < this.slices; j++) {
@@ -72,11 +75,17 @@ export class MyCone extends CGFobject {
             var z = this.radius * Math.sin(ang);
     
             this.vertices.push(x, 0, z);
-            this.normals.push(0, -1, 0);  // Normal pointing downwards
+            this.normals.push(0, -1, 0);
     
             var next = (j + 1) % this.slices;
             this.indices.push(baseCenterIndex, baseCenterIndex + 1 + j, baseCenterIndex + 1 + next);
     
+            ang += alphaAng;
+        }
+
+        ang = 0;
+        for (var j = 0; j <= this.slices; j++) {
+            this.texCoords.push(0.5 + 0.5 * Math.cos(ang), 0.5 + 0.5 * Math.sin(ang));
             ang += alphaAng;
         }
     

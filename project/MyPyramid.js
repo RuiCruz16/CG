@@ -21,6 +21,7 @@ export class MyPyramid extends CGFobject {
         this.vertices = [];
         this.indices = [];
         this.normals = [];
+        this.texCoords = [];
 
         var ang = 0;
         var alphaAng = 2 * Math.PI / this.slices;
@@ -35,6 +36,12 @@ export class MyPyramid extends CGFobject {
             this.vertices.push(0, this.height, 0);  // Apex
             this.vertices.push(ca * this.baseSize, 0, -sa * this.baseSize);  // Base point 1
             this.vertices.push(caNext * this.baseSize, 0, -saNext * this.baseSize);  // Base point 2
+
+            this.texCoords.push(0.5, 0.0);  // Apex
+            this.texCoords.push(0.0, 1.0);  // Base point 1
+            this.texCoords.push(1.0, 1.0);  // Base point 2
+
+
 
             // Normal vector calculation
             var normal = [
@@ -71,6 +78,10 @@ export class MyPyramid extends CGFobject {
             this.vertices.push(ca * this.baseSize, 0, -sa * this.baseSize);  // Base point 1
             this.vertices.push(caNext * this.baseSize, 0, -saNext * this.baseSize);  // Base point 2
             this.vertices.push(0, 0, 0);  // Center of the base
+
+            this.texCoords.push((ca + 1) / 2, (sa + 1) / 2);  // Base point 1 texture coordinate
+            this.texCoords.push((caNext + 1) / 2, (saNext + 1) / 2);  // Base point 2 texture coordinate
+            this.texCoords.push(0.5, 0.5);  // Center of the base texture coordinate
 
             this.normals.push(0, -1, 0);
             this.normals.push(0, -1, 0);
