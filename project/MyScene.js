@@ -2,6 +2,7 @@ import { CGFscene, CGFcamera, CGFaxis, CGFtexture, CGFappearance } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MySphere } from "./MySphere.js";
 import { MyPanorama } from "./MyPanorama.js";
+import { MyTree } from "./MyTree.js";
 
 /**
  * MyScene
@@ -54,6 +55,9 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
+    this.tree = new MyTree(this, 15, 3, 5, 5);
+
+
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -113,8 +117,12 @@ export class MyScene extends CGFscene {
     this.axis.display();
 
     this.setDefaultAppearance();
+
     
-    
+    this.pushMatrix();
+      this.tree.display(); // Display the tree
+    this.popMatrix();
+      
     this.pushMatrix();
       this.scale(400, 1, 400);
       this.rotate(-Math.PI / 2, 1, 0, 0);
