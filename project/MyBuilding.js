@@ -12,6 +12,7 @@ export class MyBuilding extends CGFobject {
 
     this.centerModuleWidth = this.width / 2.5;
     this.sideModuleWidth = 0.75 * this.centerModuleWidth;
+    this.heightPerFloor = this.centerModuleWidth * 0.3;
 
     this.initBuffers();
   }
@@ -21,9 +22,9 @@ export class MyBuilding extends CGFobject {
   }
 
   createModules() {
-    this.centerModule = new MyModule(this.scene, this.centerModuleWidth, this.floors + 1, this.windowsPerFloor, this.windowTexture, this.buildingColor);
-    this.rightModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.windowTexture, this.buildingColor);
-    this.leftModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.windowTexture, this.buildingColor);
+    this.centerModule = new MyModule(this.scene, this.centerModuleWidth, this.floors + 1, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, true);
+    this.rightModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, false);
+    this.leftModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, false);
   }
 
   display() {
