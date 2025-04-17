@@ -55,10 +55,10 @@ export class MyModuleTexture extends CGFobject {
       ];
     } else {
       this.normals = [
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1
+        1, 1, 1,
+        1, 1, 1,
+        1, 1, 1,
+        1, 1, 1
       ];
     }
 

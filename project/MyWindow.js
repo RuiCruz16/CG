@@ -24,11 +24,6 @@ export class MyWindow extends CGFobject {
       this.xPos + this.xSpacing, this.yPos - this.ySpacing, this.zPos  // Bottom-right
     ];
 
-    //console.log("TOP LEFT: ", this.xPos - this.xSpacing, this.yPos + this.ySpacing, this.zPos);
-    //console.log("TOP RIGHT: ", this.xPos + this.xSpacing, this.yPos + this.ySpacing, this.zPos);
-    //console.log("BOTTOM LEFT: ", this.xPos - this.xSpacing, this.yPos - this.ySpacing, this.zPos);
-    //console.log("BOTTOM RIGHT: ", this.xPos + this.xSpacing, this.yPos - this.ySpacing, this.zPos);
-
     this.indices = [
       0, 2, 1,
       2, 3, 1
@@ -42,10 +37,10 @@ export class MyWindow extends CGFobject {
     ];
 
     this.normals = [
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1
+      1, 1, 1,
+      1, 1, 1,
+      1, 1, 1,
+      1, 1, 1
     ];
 
     this.primitiveType = this.scene.gl.TRIANGLES;
