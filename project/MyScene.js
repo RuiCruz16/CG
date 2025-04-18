@@ -127,6 +127,7 @@ export class MyScene extends CGFscene {
     this.setDefaultAppearance();
 
     this.pushMatrix();
+      this.translate(100, 0, -100);
       this.building.display();
     this.popMatrix();
 
