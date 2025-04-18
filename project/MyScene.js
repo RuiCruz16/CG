@@ -2,6 +2,8 @@ import { CGFscene, CGFcamera, CGFaxis, CGFtexture, CGFappearance } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MySphere } from "./MySphere.js";
 import { MyPanorama } from "./MyPanorama.js";
+import { MyTree } from "./MyTree.js";
+import { MyForest } from "./MyForest.js";
 import { MyBuilding } from './MyBuilding.js';
 
 /**
@@ -53,6 +55,10 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 64);
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
+    this.tree = new MyTree(this, 30, 5, Math.PI/4, 'z', [0.0, 1.0, 0.0]);
+    this.forest = new MyForest(this, 4, 4); 
+
+
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
     this.displayNormals = false;
@@ -127,6 +133,15 @@ export class MyScene extends CGFscene {
     this.setDefaultAppearance();
 
     this.pushMatrix();
+      this.forest.display(); // Display the forest of trees
+    this.popMatrix();
+
+    this.pushMatrix();
+      //this.tree.display(); // Display the tree
+    this.popMatrix();
+      
+
+    this.pushMatrix();
       this.translate(100, 0, -100);
       this.building.display();
     this.popMatrix();
@@ -140,7 +155,7 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
       this.earthMaterial.apply(); // Apply the texture to the sphere!
-      this.sphere.display();
+      //this.sphere.display();
     this.popMatrix();
 
     this.panorama.display(); // Display the panorama
