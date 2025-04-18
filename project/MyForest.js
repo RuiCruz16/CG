@@ -24,8 +24,8 @@ export class MyForest extends CGFobject {
             this.trees[i] = [];
             this.offsets[i] = [];
             for (let j = 0; j < this.col; j++) {
-                let trunkHeight = Math.random() * 10 + 5;
-                let trunkRadius = Math.random() * 2 + 1; 
+                let trunkHeight = Math.random() * 20 + 5;
+                let trunkRadius = Math.random() * 4 + 1; 
                 let tiltAngle = Math.random() * Math.PI / 10;
                 let rotationAxis = Math.random() < 0.5 ? 'x' : 'z';
                 let color = [Math.random(), Math.random(), Math.random()];
@@ -41,7 +41,7 @@ export class MyForest extends CGFobject {
     }
 
     display() {
-        const spacing = 15; // Increase spacing between trees
+        const spacing = 30; // Increase spacing between trees
         for (let i = 0; i < this.row; i++) {
             for (let j = 0; j < this.col; j++) {
                 this.scene.pushMatrix();
