@@ -10,22 +10,24 @@ export class MyHeli extends CGFobject {
     super(scene);
     this.scene = scene;
     
-    this.bodyLength = 10; // Length of the helicopter body
-    this.bodyWidth = 8;   // Width of the body
-    this.bodyHeight = 8;  // Height of the body
+    this.bodyLength = 6; // Length of the helicopter body
+    this.bodyWidth = 4;   // Width of the body
+    this.bodyHeight = 4;  // Height of the body
 
-    this.tailLength = 4;  // Tail length
+    this.tailLength = 5;  // Tail length
     this.tailHeight = 1;  // Tail height
 
-    this.mainRotorLength = 6; // Main rotor radius
-    this.mainRotorHeight = 0.5; // Main rotor height
+    this.mainRotorLength = this.bodyLength * 3; // Main rotor radius
+    this.mainRotorHeight = 0.2; // Main rotor height
     this.mainRotorWidth = 0.5; // Main rotor width
 
-    this.tailRotorLength = 2; // Tail rotor radius
+    this.tailRotorLength = this.bodyLength*1.2; // Tail rotor radius
     this.tailRotorHeight = 0.2; // Tail rotor height
-    this.tailRotorWidth = 0.2; // Tail rotor width
+    this.tailRotorWidth = 0.5; // Tail rotor width
 
-    this.landingGearLength = 1; // Landing gear size
+    this.landingGearLength = this.bodyLength * 2; // Landing gear length
+    this.landingGearHeight = 7; // Landing gear height
+
     this.bucketSize = 2; // Bucket size
     this.initBuffers();
   }
@@ -34,8 +36,15 @@ export class MyHeli extends CGFobject {
     // Create body, tail, and other parts of the helicopter
     this.body = new MyEllipsoid(this.scene, 50, 20, this.bodyLength, this.bodyHeight, this.bodyWidth);
     this.mainRotor = new MyRectangularPrism(this.scene, this.mainRotorLength, this.mainRotorHeight, this.mainRotorWidth);
+    this.mainRotorExtension = new MyCylinder(this.scene, 20, 1, this.tailLength/2, this.tailHeight/2);
+    this.mainRotorConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/6, this.bodyHeight/8, this.bodyLength/6);
+    //this.tail = new MyRectangularPrism(this.scene, this.tailLength, this.tailHeight, this.tailHeight);
     this.tailRotor = new MyRectangularPrism(this.scene, this.tailRotorLength, this.tailRotorHeight, this.tailRotorWidth);
     this.tail = new MyCylinder(this.scene, 20, 1, this.tailLength, this.tailHeight);
+    this.tailConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/4, this.bodyHeight/3, this.bodyLength/5);
+    this.tailRotorConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/7, this.bodyHeight/9, this.bodyLength/7);
+    this.tailRotorExtension = new MyCylinder(this.scene, 20, 1, this.tailLength/3, this.tailHeight/2);
+    this.landingGear = new MyCylinder(this.scene, 20, 1, this.landingGearLength, 0.5);
 
     this.initTextures();
   }
@@ -51,17 +60,132 @@ export class MyHeli extends CGFobject {
 
     // Draw the helicopter body
     this.scene.pushMatrix();
-        this.scene.translate(0, 10, 0);
+        this.scene.translate(0, this.landingGearHeight, 0);
         this.bodyTexture.apply();
         this.body.display();
     this.scene.popMatrix();
 
+    // Draw the main rotor
+    this.scene.pushMatrix();
+        this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+        this.mainRotor.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.mainRotor.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+        this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+        this.scene.rotate(Math.PI / 2, 1, 0, 0);
+        this.mainRotorExtension.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+        this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.mainRotorConnection.display();
+    this.scene.popMatrix();
+
     // Draw the tail
     this.scene.pushMatrix();
-        this.scene.translate(this.bodyLength - 1, 10, 0);
-        this.scene.rotate(Math.PI / 2, 0, 1, 0);
-        this.scene.scale(2, 2, 2);
-        this.tail.display();
+      this.scene.translate(this.bodyLength-0.5, this.landingGearHeight, 0);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.tail.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+      this.scene.rotate(Math.PI / 3, 0, 0, 1);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.scene.scale(0.5, 0.5, 0.6);
+      this.tail.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+      this.scene.rotate(-Math.PI / 3, 0, 0, 1);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.scene.scale(0.5, 0.5, 0.6);
+      this.tail.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+      this.tailConnection.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+        this.tailRotorExtension.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+        this.scene.rotate(Math.PI / 2, 1, 0, 0);
+        this.tailRotorConnection.display();
+    this.scene.popMatrix();
+
+
+    // Draw the tail rotor
+    this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+        this.tailRotor.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+        this.scene.rotate(Math.PI / 2, 0, 0, 1);
+        this.tailRotor.display();
+    this.scene.popMatrix();
+
+    // Draw the landing gear
+    this.scene.pushMatrix();
+      this.scene.translate(-this.landingGearLength/2, 0, this.bodyWidth+1);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.landingGear.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(-this.landingGearLength/2, 0, -this.bodyWidth-1);
+      this.scene.rotate(Math.PI / 2, 0, 1, 0);
+      this.landingGear.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(-this.landingGearLength/4, 0, 0);
+      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
+      this.scene.rotate(Math.PI / 3, 1, 0, 0);
+      this.scene.scale(0.5, 0.5, 0.5);
+      this.landingGear.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(-this.landingGearLength/4, 0, 0);
+      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.rotate(Math.PI / 3, 1, 0, 0);
+      this.scene.scale(0.5, 0.5, 0.5);
+      this.landingGear.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(this.landingGearLength/4, 0, 0);
+      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
+      this.scene.rotate(Math.PI / 3, 1, 0, 0);
+      this.scene.scale(0.5, 0.5, 0.5);
+      this.landingGear.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+      this.scene.translate(this.landingGearLength/4, 0, 0);
+      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.rotate(Math.PI / 3, 1, 0, 0);
+      this.scene.scale(0.5, 0.5, 0.5);
+      this.landingGear.display();
     this.scene.popMatrix();
 
   }

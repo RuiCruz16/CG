@@ -120,7 +120,7 @@ export class MyScene extends CGFscene {
     this.applyViewMatrix();
 
     // Draw axis
-    //this.axis.display();
+    this.axis.display();
 
     if (this.displayNormals) {
       this.building.centerModule.enableNormalViz();

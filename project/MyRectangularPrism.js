@@ -14,13 +14,13 @@ export class MyRectangularPrism extends CGFobject {
         this.indices = [];
         this.normals = [];
         this.texCoords = [];
-
+    
         const halfLength = this.length / 2;
         const halfHeight = this.height / 2;
         const halfWidth = this.width / 2;
-
+    
         // Define the 8 vertices for the rectangular prism
-        this.vertices.push(
+        this.vertices = [
             -halfLength, -halfHeight, -halfWidth,  // Vertex 0
             halfLength, -halfHeight, -halfWidth,   // Vertex 1
             halfLength, halfHeight, -halfWidth,    // Vertex 2
@@ -29,45 +29,49 @@ export class MyRectangularPrism extends CGFobject {
             halfLength, -halfHeight, halfWidth,    // Vertex 5
             halfLength, halfHeight, halfWidth,     // Vertex 6
             -halfLength, halfHeight, halfWidth     // Vertex 7
-        );
-
-        // Define the normals for each face of the rectangular prism
-        // Normals pointing outwards (based on the faces)
-        this.normals.push(
-            0, 0, -1, // Front face
-            0, 0, 1,  // Back face
-            0, 1, 0,  // Top face
-            0, -1, 0, // Bottom face
-            -1, 0, 0, // Left face
-            1, 0, 0   // Right face
-        );
-
+        ];
+    
+        // Define the normals for each vertex
+        this.normals = [
+            // One normal per vertex (8 vertices)
+            0, 0, -1,  // Vertex 0
+            0, 0, -1,  // Vertex 1
+            0, 0, -1,  // Vertex 2
+            0, 0, -1,  // Vertex 3
+            0, 0, 1,   // Vertex 4
+            0, 0, 1,   // Vertex 5
+            0, 0, 1,   // Vertex 6
+            0, 0, 1    // Vertex 7
+        ];
+    
         // Define texture coordinates (mapping the texture across the 6 faces)
-        this.texCoords.push(
-            0, 0, 1, 0, 1, 1, 0, 1,  // Front face (0,1,2,3)
-            0, 0, 1, 0, 1, 1, 0, 1,  // Back face (4,5,6,7)
-            0, 0, 1, 0, 1, 1, 0, 1,  // Top face (3,2,6,7)
-            0, 0, 1, 0, 1, 1, 0, 1,  // Bottom face (0,1,5,4)
-            0, 0, 1, 0, 1, 1, 0, 1,  // Left face (0,3,7,4)
-            0, 0, 1, 0, 1, 1, 0, 1   // Right face (1,2,6,5)
-        );
-
+        this.texCoords = [
+            0, 0,  // Vertex 0
+            1, 0,  // Vertex 1
+            1, 1,  // Vertex 2
+            0, 1,  // Vertex 3
+            0, 0,  // Vertex 4
+            1, 0,  // Vertex 5
+            1, 1,  // Vertex 6
+            0, 1   // Vertex 7
+        ];
+    
         // Define indices for the 6 faces (2 triangles per face)
-        this.indices.push(
-            // Front face
-            0, 1, 2,  0, 2, 3,
-            // Back face
-            4, 5, 6,  4, 6, 7,
-            // Top face
-            3, 2, 6,  3, 6, 7,
-            // Bottom face
-            0, 1, 5,  0, 5, 4,
-            // Left face
-            0, 3, 7,  0, 7, 4,
-            // Right face
-            1, 2, 6,  1, 6, 5
-        );
-
+        this.indices = [
+            // Front face (z = -halfWidth)
+            0, 3, 2,  0, 2, 1,  // OK
+            // Back face (z = halfWidth)
+            4, 5, 6, 4, 6, 7,  // OK
+            // Top face (y = halfHeight)
+            3, 7, 6,  3, 6, 2,  // OK
+            // Bottom face (y = -halfHeight)
+            0, 1, 5,  0, 5, 4,  // FIXED - was: 5, 1, 0,  5, 0, 4
+            // Left face (x = -halfLength)
+            0, 4, 7,  0, 7, 3,  // FIXED - was: 4, 7, 3,  4, 3, 0
+            // Right face (x = halfLength)
+            1, 2, 6,  1, 6, 5   // OK
+        ];
+    
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
     }
