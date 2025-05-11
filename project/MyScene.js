@@ -64,6 +64,7 @@ export class MyScene extends CGFscene {
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
     this.displayNormals = false;
+    this.speedFactor = 1;
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -80,6 +81,8 @@ export class MyScene extends CGFscene {
       vec3.fromValues(0, 0, 0)
     );
   }
+
+  /*
   checkKeys() {
     var text = "Keys pressed: ";
     var keysPressed = false;
@@ -97,9 +100,50 @@ export class MyScene extends CGFscene {
     if (keysPressed)
       console.log(text);
   }
+  */
+
+  checkKeys() {
+    
+    if (this.gui.isKeyPressed("KeyW"))
+      this.helicopter.accelerate(0.1 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyS"))
+      this.helicopter.accelerate(-0.1 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyA"))
+      this.helicopter.turn(0.03 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyD"))
+      this.helicopter.turn(-0.03 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyR")) {
+      this.helicopter.x = 100;
+      this.helicopter.z = -100;
+      this.helicopter.y = 48;
+      this.helicopter.velocity = { x: 0, z: 0 };
+      this.helicopter.orientation = 0;
+      this.helicopter.pitch = 0;
+      this.helicopter.isFlying = false;
+    }
+  
+    if (this.gui.isKeyPressed("KeyP")) {
+      this.helicopter.isFlying = true;
+      this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
+    }
+    
+    if (this.gui.isKeyPressed("KeyL")) {
+      this.helicopter.tilt = 0;
+      this.helicopter.targetAltitude = 0;
+      if (this.helicopter.y <= 0.01) {
+        this.helicopter.isFlying = false;
+        this.helicopter.velocity = { x: 0, z: 0 };
+      }
+    }
+  }
 
   update(t) {
     this.checkKeys();
+    this.helicopter.update(this.updatePeriod); 
   }
 
   setDefaultAppearance() {
@@ -137,12 +181,12 @@ export class MyScene extends CGFscene {
     this.setDefaultAppearance();
 
     this.pushMatrix();
-      this.translate(100, 48, -100);
+      //this.translate(100, 48, -100);
       this.helicopter.display(); // Display the helicopter
     this.popMatrix();
 
     this.pushMatrix();
-      //this.forest.display(); // Display the forest of trees
+      this.forest.display(); // Display the forest of trees
     this.popMatrix();
 
     this.pushMatrix();

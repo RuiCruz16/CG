@@ -29,6 +29,21 @@ export class MyHeli extends CGFobject {
     this.landingGearHeight = 7; // Landing gear height
 
     this.bucketSize = 2; // Bucket size
+
+    this.x = 100;
+    this.y = 48;
+    this.z = -100;
+    this.orientation = 0;
+    this.velocity = { x: 0, z: 0 };
+    this.tilt = 0;
+    
+    this.isFlying = false;
+    this.cruiseAltitude = 70;
+    this.altitude = this.y;
+
+    this.targetAltitude = this.y;
+    this.altitudeSpeed = 10;
+
     this.initBuffers();
   }
 
@@ -81,154 +96,206 @@ export class MyHeli extends CGFobject {
     this.tailTex.loadTexture('images/heli_tail.jpg');
   }
 
+  turn(v) {
+    this.orientation += v;
+    
+    let speed = Math.sqrt(this.velocity.x ** 2 + this.velocity.z ** 2);
+    
+    let forwardVector = {
+      x: Math.cos(this.orientation - v),
+      z: -Math.sin(this.orientation - v)
+    };
+    
+    let currentDirection = this.velocity.x * forwardVector.x + this.velocity.z * forwardVector.z;
+    let isMovingForward = currentDirection >= 0;
+    
+    if (!isMovingForward) speed = -speed;
+    
+    this.velocity.x = speed * Math.cos(this.orientation);
+    this.velocity.z = -speed * Math.sin(this.orientation);
+  }
+  
+  accelerate(v) {
+    v = -v;
+    
+    let dirX = Math.cos(this.orientation);
+    let dirZ = -Math.sin(this.orientation);
+  
+    this.velocity.x += v * dirX;
+    this.velocity.z += v * dirZ;
+    
+    this.tilt = v < 0 ? Math.PI / 18 : (v > 0 ? -Math.PI / 18 : 0);
+  }
+
+  update(deltaTime) {
+    let dt = deltaTime / 1000;
+  
+    if (this.isFlying) {
+      this.x += this.velocity.x * dt;
+      this.z += this.velocity.z * dt;
+    }
+  
+    if (this.y < this.targetAltitude) {
+      this.y = Math.min(this.y + this.altitudeSpeed * dt, this.targetAltitude);
+    } else if (this.y > this.targetAltitude) {
+      this.y = Math.max(this.y - this.altitudeSpeed * dt, this.targetAltitude);
+    }
+  }  
+
   display() {
-
-    // Draw the helicopter body
     this.scene.pushMatrix();
-        this.scene.translate(0, this.landingGearHeight, 0);
-        this.bodyTex.apply();
-        this.body.display();
-    this.scene.popMatrix();
 
-    // Draw the main rotor
-    this.scene.pushMatrix();
-        this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
-        this.rotorTex.apply();
-        this.mainRotor.display();
-    this.scene.popMatrix();
+      this.scene.translate(this.x, this.y, this.z);
+      this.scene.rotate(this.orientation, 0, 1, 0);
+      this.scene.rotate(this.tilt, 0, 0, 1);
 
-    this.scene.pushMatrix();
-      this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.rotorTex.apply();
-      this.mainRotor.display();
-    this.scene.popMatrix();
+      // Draw the helicopter body
+      this.scene.pushMatrix();
+          this.scene.translate(0, this.landingGearHeight, 0);
+          this.bodyTex.apply();
+          this.body.display();
+      this.scene.popMatrix();
 
-    this.scene.pushMatrix();
-        this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
-        this.scene.rotate(Math.PI / 2, 1, 0, 0);
-        this.connectionTex.apply();
-        this.mainRotorExtension.display();
-    this.scene.popMatrix();
+      // Draw the main rotor
+      this.scene.pushMatrix();
+          this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+          this.rotorTex.apply();
+          this.mainRotor.display();
+      this.scene.popMatrix();
 
-    this.scene.pushMatrix();
+      this.scene.pushMatrix();
         this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
         this.scene.rotate(Math.PI / 2, 0, 1, 0);
-        this.connectionTex.apply();
-        this.mainRotorConnection.display();
-    this.scene.popMatrix();
+        this.rotorTex.apply();
+        this.mainRotor.display();
+      this.scene.popMatrix();
 
-    // Draw the tail
-    this.scene.pushMatrix();
-      this.scene.translate(this.bodyLength-0.5, this.landingGearHeight, 0);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.tailTex.apply();
-      this.tail.display();
-    this.scene.popMatrix();
+      this.scene.pushMatrix();
+          this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+          this.scene.rotate(Math.PI / 2, 1, 0, 0);
+          this.connectionTex.apply();
+          this.mainRotorExtension.display();
+      this.scene.popMatrix();
 
-    this.scene.pushMatrix();
-      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
-      this.scene.rotate(Math.PI / 3, 0, 0, 1);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.scene.scale(0.5, 0.5, 0.6);
-      this.tailTex.apply();
-      this.tail.display();
-    this.scene.popMatrix();
+      this.scene.pushMatrix();
+          this.scene.translate(0, this.landingGearHeight + this.bodyHeight + 1, 0);
+          this.scene.rotate(Math.PI / 2, 0, 1, 0);
+          this.connectionTex.apply();
+          this.mainRotorConnection.display();
+      this.scene.popMatrix();
 
-    this.scene.pushMatrix();
-      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
-      this.scene.rotate(-Math.PI / 3, 0, 0, 1);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.scene.scale(0.5, 0.5, 0.6);
-      this.tailTex.apply();
-      this.tail.display();
-    this.scene.popMatrix();
+      // Draw the tail
+      this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength-0.5, this.landingGearHeight, 0);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.tailTex.apply();
+        this.tail.display();
+      this.scene.popMatrix();
 
-    this.scene.pushMatrix();
-      this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
-      this.tailConnection.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
+      this.scene.pushMatrix();
         this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
-        this.connectionTex.apply();
-        this.tailRotorExtension.display();
+        this.scene.rotate(Math.PI / 3, 0, 0, 1);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.scene.scale(0.5, 0.5, 0.6);
+        this.tailTex.apply();
+        this.tail.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+        this.scene.rotate(-Math.PI / 3, 0, 0, 1);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.scene.scale(0.5, 0.5, 0.6);
+        this.tailTex.apply();
+        this.tail.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+        this.tailConnection.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+          this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, 0);
+          this.connectionTex.apply();
+          this.tailRotorExtension.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+          this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+          this.scene.rotate(Math.PI / 2, 1, 0, 0);
+          this.connectionTex.apply();
+          this.tailRotorConnection.display();
+      this.scene.popMatrix();
+
+
+      // Draw the tail rotor
+      this.scene.pushMatrix();
+          this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+          this.rotorTex.apply();
+          this.tailRotor.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+          this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
+          this.scene.rotate(Math.PI / 2, 0, 0, 1);
+          this.rotorTex.apply();
+          this.tailRotor.display();
+      this.scene.popMatrix();
+
+      // Draw the landing gear
+      this.scene.pushMatrix();
+        this.scene.translate(-this.landingGearLength/2, 0, this.bodyWidth+1);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(-this.landingGearLength/2, 0, -this.bodyWidth-1);
+        this.scene.rotate(Math.PI / 2, 0, 1, 0);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(-this.landingGearLength/4, 0, 0);
+        this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
+        this.scene.rotate(Math.PI / 3, 1, 0, 0);
+        this.scene.scale(0.5, 0.5, 0.5);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(-this.landingGearLength/4, 0, 0);
+        this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
+        this.scene.rotate(Math.PI, 0, 1, 0);
+        this.scene.rotate(Math.PI / 3, 1, 0, 0);
+        this.scene.scale(0.5, 0.5, 0.5);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(this.landingGearLength/4, 0, 0);
+        this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
+        this.scene.rotate(Math.PI / 3, 1, 0, 0);
+        this.scene.scale(0.5, 0.5, 0.5);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
+      this.scene.pushMatrix();
+        this.scene.translate(this.landingGearLength/4, 0, 0);
+        this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
+        this.scene.rotate(Math.PI, 0, 1, 0);
+        this.scene.rotate(Math.PI / 3, 1, 0, 0);
+        this.scene.scale(0.5, 0.5, 0.5);
+        this.gearTex.apply();
+        this.landingGear.display();
+      this.scene.popMatrix();
+
     this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
-        this.scene.rotate(Math.PI / 2, 1, 0, 0);
-        this.connectionTex.apply();
-        this.tailRotorConnection.display();
-    this.scene.popMatrix();
-
-
-    // Draw the tail rotor
-    this.scene.pushMatrix();
-        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
-        this.rotorTex.apply();
-        this.tailRotor.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-        this.scene.translate(this.bodyLength + this.tailLength, this.landingGearHeight, this.tailLength/3);
-        this.scene.rotate(Math.PI / 2, 0, 0, 1);
-        this.rotorTex.apply();
-        this.tailRotor.display();
-    this.scene.popMatrix();
-
-    // Draw the landing gear
-    this.scene.pushMatrix();
-      this.scene.translate(-this.landingGearLength/2, 0, this.bodyWidth+1);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-      this.scene.translate(-this.landingGearLength/2, 0, -this.bodyWidth-1);
-      this.scene.rotate(Math.PI / 2, 0, 1, 0);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-      this.scene.translate(-this.landingGearLength/4, 0, 0);
-      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
-      this.scene.rotate(Math.PI / 3, 1, 0, 0);
-      this.scene.scale(0.5, 0.5, 0.5);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-      this.scene.translate(-this.landingGearLength/4, 0, 0);
-      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
-      this.scene.rotate(Math.PI, 0, 1, 0);
-      this.scene.rotate(Math.PI / 3, 1, 0, 0);
-      this.scene.scale(0.5, 0.5, 0.5);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-      this.scene.translate(this.landingGearLength/4, 0, 0);
-      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, this.bodyWidth/2);
-      this.scene.rotate(Math.PI / 3, 1, 0, 0);
-      this.scene.scale(0.5, 0.5, 0.5);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-      this.scene.translate(this.landingGearLength/4, 0, 0);
-      this.scene.translate(0, this.landingGearHeight - this.bodyHeight/2, -this.bodyWidth/2);
-      this.scene.rotate(Math.PI, 0, 1, 0);
-      this.scene.rotate(Math.PI / 3, 1, 0, 0);
-      this.scene.scale(0.5, 0.5, 0.5);
-      this.gearTex.apply();
-      this.landingGear.display();
-    this.scene.popMatrix();
-
   }
 }
