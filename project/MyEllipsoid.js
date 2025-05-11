@@ -41,12 +41,10 @@ export class MyEllipsoid extends CGFobject {
                 var sinPhi = Math.sin(phi);
                 var cosPhi = Math.cos(phi);
     
-                // Fix: Use standard spherical coordinate equations for a full ellipsoid
                 var x = this.radiusX * sinTheta * cosPhi;
                 var y = this.radiusY * sinTheta * sinPhi;
                 var z = this.radiusZ * cosTheta;
     
-                // Fix: Normalize the normal vector correctly
                 var nx = (sinTheta * cosPhi) / this.radiusX;
                 var ny = (sinTheta * sinPhi) / this.radiusY;
                 var nz = cosTheta / this.radiusZ;
@@ -61,7 +59,6 @@ export class MyEllipsoid extends CGFobject {
                 this.normals.push(nx, ny, nz);
                 this.texCoords.push(j / this.slices, i / this.stacks);
     
-                // The indices portion is correct
                 if (i < this.stacks && j < this.slices) {
                     var current = i * (this.slices + 1) + j;
                     var next = current + this.slices + 1;

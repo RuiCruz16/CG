@@ -19,7 +19,6 @@ export class MyRectangularPrism extends CGFobject {
         const halfHeight = this.height / 2;
         const halfWidth = this.width / 2;
     
-        // Define the 8 vertices for the rectangular prism
         this.vertices = [
             -halfLength, -halfHeight, -halfWidth,  // Vertex 0
             halfLength, -halfHeight, -halfWidth,   // Vertex 1
@@ -31,20 +30,17 @@ export class MyRectangularPrism extends CGFobject {
             -halfLength, halfHeight, halfWidth     // Vertex 7
         ];
     
-        // Define the normals for each vertex
         this.normals = [
-            // One normal per vertex (8 vertices)
-            0, 0, -1,  // Vertex 0
-            0, 0, -1,  // Vertex 1
-            0, 0, -1,  // Vertex 2
-            0, 0, -1,  // Vertex 3
-            0, 0, 1,   // Vertex 4
-            0, 0, 1,   // Vertex 5
-            0, 0, 1,   // Vertex 6
-            0, 0, 1    // Vertex 7
+            0, 1, -1,  // Vertex 0
+            0, 1, -1,  // Vertex 1
+            0, 1, -1,  // Vertex 2
+            0, 1, -1,  // Vertex 3
+            0, 1, 1,   // Vertex 4
+            0, 1, 1,   // Vertex 5
+            0, 1, 1,   // Vertex 6
+            0, 1, 1,    // Vertex 7
         ];
     
-        // Define texture coordinates (mapping the texture across the 6 faces)
         this.texCoords = [
             0, 0,  // Vertex 0
             1, 0,  // Vertex 1
@@ -56,25 +52,32 @@ export class MyRectangularPrism extends CGFobject {
             0, 1   // Vertex 7
         ];
     
-        // Define indices for the 6 faces (2 triangles per face)
         this.indices = [
             // Front face (z = -halfWidth)
-            0, 3, 2,  0, 2, 1,  // OK
+            0, 3, 2,  0, 2, 1,
             // Back face (z = halfWidth)
-            4, 5, 6, 4, 6, 7,  // OK
+            4, 5, 6, 4, 6, 7,
             // Top face (y = halfHeight)
-            3, 7, 6,  3, 6, 2,  // OK
+            3, 7, 6,  3, 6, 2,
             // Bottom face (y = -halfHeight)
-            0, 1, 5,  0, 5, 4,  // FIXED - was: 5, 1, 0,  5, 0, 4
+            0, 1, 5,  0, 5, 4,
             // Left face (x = -halfLength)
-            0, 4, 7,  0, 7, 3,  // FIXED - was: 4, 7, 3,  4, 3, 0
+            0, 4, 7,  0, 7, 3,
             // Right face (x = halfLength)
-            1, 2, 6,  1, 6, 5   // OK
+            1, 2, 6,  1, 6, 5
         ];
     
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
     }
+
+    enableNormalViz() {
+        super.enableNormalViz();
+    }
+      
+    disableNormalViz() {
+        super.disableNormalViz();
+    }  
 
     display() {
         super.display();

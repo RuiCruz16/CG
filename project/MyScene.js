@@ -126,15 +126,18 @@ export class MyScene extends CGFscene {
       this.building.centerModule.enableNormalViz();
       this.building.leftModule.enableNormalViz();
       this.building.rightModule.enableNormalViz();
+      this.helicopter.tailRotor.enableNormalViz();
     } else {
       this.building.centerModule.disableNormalViz();
       this.building.leftModule.disableNormalViz();
       this.building.rightModule.disableNormalViz();
+      this.helicopter.tailRotor.disableNormalViz();
     }    
 
     this.setDefaultAppearance();
 
     this.pushMatrix();
+      this.translate(100, 48, -100);
       this.helicopter.display(); // Display the helicopter
     this.popMatrix();
 

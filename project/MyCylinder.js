@@ -30,7 +30,7 @@ export class MyCylinder extends CGFobject {
         // Generate the cylinder sides
         for (let j = 0; j <= this.stacks; j++) {
             let z = (j / this.stacks) * this.height;
-            for (let i = 0; i <= this.slices; i++) { // Note: <= to get a complete loop
+            for (let i = 0; i <= this.slices; i++) {
                 let x = this.radius * Math.cos(i * angle);
                 let y = this.radius * Math.sin(i * angle);
                 let sizeNormal = Math.sqrt(x * x + y * y);
@@ -77,8 +77,8 @@ export class MyCylinder extends CGFobject {
         for (let i = 0; i < this.slices; i++) {
             this.indices.push(
                 bottomCenterIndex,
-                bottomCenterIndex + i + 2,    // SWAP these two values
-                bottomCenterIndex + i + 1     // to fix winding order
+                bottomCenterIndex + i + 2,
+                bottomCenterIndex + i + 1
             );
         }
 
@@ -104,8 +104,8 @@ export class MyCylinder extends CGFobject {
         for (let i = 0; i < this.slices; i++) {
             this.indices.push(
                 topCenterIndex,
-                topCenterIndex + i + 1,       // SWAP these two values
-                topCenterIndex + i + 2        // to fix winding order
+                topCenterIndex + i + 1,
+                topCenterIndex + i + 2
             );
         }
 
