@@ -105,16 +105,19 @@ export class MyScene extends CGFscene {
   checkKeys() {
     
     if (this.gui.isKeyPressed("KeyW"))
-      this.helicopter.accelerate(0.1 * this.speedFactor);
+      this.helicopter.accelerate(0.5 * this.speedFactor);
   
     if (this.gui.isKeyPressed("KeyS"))
-      this.helicopter.accelerate(-0.1 * this.speedFactor);
+      this.helicopter.accelerate(-0.5 * this.speedFactor);
+
+    if (!this.gui.isKeyPressed("KeyW") && !this.gui.isKeyPressed("KeyS"))
+      this.helicopter.accelerate(0);
   
     if (this.gui.isKeyPressed("KeyA"))
-      this.helicopter.turn(0.03 * this.speedFactor);
+      this.helicopter.turn(0.1 * this.speedFactor);
   
     if (this.gui.isKeyPressed("KeyD"))
-      this.helicopter.turn(-0.03 * this.speedFactor);
+      this.helicopter.turn(-0.1 * this.speedFactor);
   
     if (this.gui.isKeyPressed("KeyR")) {
       this.helicopter.x = 100;
@@ -122,22 +125,18 @@ export class MyScene extends CGFscene {
       this.helicopter.y = 48;
       this.helicopter.velocity = { x: 0, z: 0 };
       this.helicopter.orientation = 0;
-      this.helicopter.pitch = 0;
-      this.helicopter.isFlying = false;
+      this.helicopter.tilt = 0;
+      this.helicopter.targetAltitude = 48;
     }
   
     if (this.gui.isKeyPressed("KeyP")) {
-      this.helicopter.isFlying = true;
       this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
     }
     
     if (this.gui.isKeyPressed("KeyL")) {
       this.helicopter.tilt = 0;
       this.helicopter.targetAltitude = 0;
-      if (this.helicopter.y <= 0.01) {
-        this.helicopter.isFlying = false;
-        this.helicopter.velocity = { x: 0, z: 0 };
-      }
+      this.helicopter.velocity = { x: 0, z: 0 };
     }
   }
 

@@ -35,6 +35,7 @@ export class MyHeli extends CGFobject {
     this.z = -100;
     this.orientation = 0;
     this.velocity = { x: 0, z: 0 };
+    this.maxSpeed = 40;
     this.tilt = 0;
     
     this.isFlying = false;
@@ -97,6 +98,9 @@ export class MyHeli extends CGFobject {
   }
 
   turn(v) {
+    if (!this.isFlying) {
+      return;
+    }
     this.orientation += v;
     
     let speed = Math.sqrt(this.velocity.x ** 2 + this.velocity.z ** 2);
@@ -116,16 +120,25 @@ export class MyHeli extends CGFobject {
   }
   
   accelerate(v) {
-    v = -v;
-    
-    let dirX = Math.cos(this.orientation);
-    let dirZ = -Math.sin(this.orientation);
-  
-    this.velocity.x += v * dirX;
-    this.velocity.z += v * dirZ;
-    
-    this.tilt = v < 0 ? Math.PI / 18 : (v > 0 ? -Math.PI / 18 : 0);
+    if (!this.isFlying) return;
+
+    const dirX = Math.cos(this.orientation);
+    const dirZ = -Math.sin(this.orientation);
+
+    // Predict new velocity if we apply acceleration v
+    const newVx = this.velocity.x - v * dirX;
+    const newVz = this.velocity.z - v * dirZ;
+
+    const newSpeed = Math.sqrt(newVx ** 2 + newVz ** 2);
+
+    if (newSpeed > this.maxSpeed) return;
+
+    this.velocity.x = newVx;
+    this.velocity.z = newVz;
+
+    this.tilt = v > 0 ? Math.PI / 18 : (v < 0 ? -Math.PI / 18 : 0);
   }
+
 
   update(deltaTime) {
     let dt = deltaTime / 1000;
@@ -139,6 +152,12 @@ export class MyHeli extends CGFobject {
       this.y = Math.min(this.y + this.altitudeSpeed * dt, this.targetAltitude);
     } else if (this.y > this.targetAltitude) {
       this.y = Math.max(this.y - this.altitudeSpeed * dt, this.targetAltitude);
+    }
+    if (this.y == this.cruiseAltitude) {
+      this.isFlying = true;
+    }
+    else {
+      this.isFlying = false;
     }
   }  
 
