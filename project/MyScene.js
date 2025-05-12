@@ -104,8 +104,10 @@ export class MyScene extends CGFscene {
 
   checkKeys() {
     
-    if (this.gui.isKeyPressed("KeyW"))
+    if (this.gui.isKeyPressed("KeyW")) {
       this.helicopter.accelerate(0.5 * this.speedFactor);
+      console.log("accelerate");
+    }
   
     if (this.gui.isKeyPressed("KeyS"))
       this.helicopter.accelerate(-0.5 * this.speedFactor);
@@ -130,6 +132,7 @@ export class MyScene extends CGFscene {
     }
   
     if (this.gui.isKeyPressed("KeyP")) {
+      console.log("Cruise altitude: " + this.helicopter.y);
       this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
     }
     
@@ -163,7 +166,7 @@ export class MyScene extends CGFscene {
     this.applyViewMatrix();
 
     // Draw axis
-    this.axis.display();
+    //this.axis.display();
 
     if (this.displayNormals) {
       this.building.centerModule.enableNormalViz();

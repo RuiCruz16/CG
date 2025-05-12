@@ -4,6 +4,15 @@ import { MyCone } from './MyCone.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MyEllipsoid } from './MyEllipsoid.js';
 import { MyRectangularPrism } from './MyRectangularPrism.js';
+import { MyCylinderWTopCap } from './MyCylinderWTopCap.js';
+
+export const HeliState = Object.freeze({
+  LANDED: 'LANDED',
+  TAKING_OFF: 'TAKING_OFF',
+  FLYING: 'FLYING',
+  LANDING: 'LANDING',
+  REFFILLING: 'REFILLING'
+});
 
 export class MyHeli extends CGFobject {
   constructor(scene) {
@@ -28,7 +37,10 @@ export class MyHeli extends CGFobject {
     this.landingGearLength = this.bodyLength * 2; // Landing gear length
     this.landingGearHeight = 7; // Landing gear height
 
-    this.bucketSize = 2; // Bucket size
+    this.bucketRadius = 2; // Bucket size
+    this.bucketHeight = 3; // Bucket size
+
+    this.bucketCableLength = 13; // Bucket cable length
 
     this.x = 100;
     this.y = 48;
@@ -38,7 +50,7 @@ export class MyHeli extends CGFobject {
     this.maxSpeed = 40;
     this.tilt = 0;
     
-    this.isFlying = false;
+    this.heliState = HeliState.LANDED;
     this.cruiseAltitude = 70;
     this.altitude = this.y;
 
@@ -61,6 +73,9 @@ export class MyHeli extends CGFobject {
     this.tailRotorConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/7, this.bodyHeight/9, this.bodyLength/7);
     this.tailRotorExtension = new MyCylinder(this.scene, 20, 1, this.tailLength/3, this.tailHeight/2);
     this.landingGear = new MyCylinder(this.scene, 20, 1, this.landingGearLength, 0.5);
+    this.bucket = new MyCylinderWTopCap(this.scene, 20, 1, this.bucketHeight, this.bucketRadius);
+    this.bucketCap = new MyCylinder(this.scene, 20, 1, this.bucketHeight, this.bucketRadius);
+    this.bucketCable = new MyCylinder(this.scene, 20, 1, this.bucketCableLength, this.bucketRadius/12);
 
     this.initTextures();
   }
@@ -95,10 +110,34 @@ export class MyHeli extends CGFobject {
     this.tailTex.setSpecular(0.2, 0.2, 0.2, 1);
     this.tailTex.setShininess(10);
     this.tailTex.loadTexture('images/heli_tail.jpg');
+
+    this.bucketTex = new CGFappearance(this.scene);
+    this.bucketTex.setDiffuse(0.5, 0.5, 0.5, 1);
+    this.bucketTex.setSpecular(0.2, 0.2, 0.2, 1);
+    this.bucketTex.setShininess(10);
+    this.bucketTex.loadTexture('images/heli_tail.jpg');
+
+    this.bucketCapTexEmpty = new CGFappearance(this.scene);
+    this.bucketCapTexEmpty.setDiffuse(0.5, 0.5, 0.5, 1);
+    this.bucketCapTexEmpty.setSpecular(0.2, 0.2, 0.2, 1);
+    this.bucketCapTexEmpty.setShininess(10);
+    this.bucketCapTexEmpty.loadTexture('images/inside_bucket.jpg');
+
+    this.bucketCapTexFull = new CGFappearance(this.scene);
+    this.bucketCapTexFull.setDiffuse(0.5, 0.5, 0.5, 1);
+    this.bucketCapTexFull.setSpecular(0.2, 0.2, 0.2, 1);
+    this.bucketCapTexFull.setShininess(10);
+    this.bucketCapTexFull.loadTexture('images/water_bucket.jpg');
+
+    this.bucketCableTex = new CGFappearance(this.scene);
+    this.bucketCableTex.setDiffuse(0.5, 0.5, 0.5, 1);
+    this.bucketCableTex.setSpecular(0.2, 0.2, 0.2, 1);
+    this.bucketCableTex.setShininess(10);
+    this.bucketCableTex.loadTexture('images/cable.jpg');
   }
 
   turn(v) {
-    if (!this.isFlying) {
+    if (this.heliState != HeliState.FLYING) {
       return;
     }
     this.orientation += v;
@@ -120,7 +159,7 @@ export class MyHeli extends CGFobject {
   }
   
   accelerate(v) {
-    if (!this.isFlying) return;
+    if (this.heliState != HeliState.FLYING) return;
 
     const dirX = Math.cos(this.orientation);
     const dirZ = -Math.sin(this.orientation);
@@ -133,8 +172,17 @@ export class MyHeli extends CGFobject {
 
     if (newSpeed > this.maxSpeed) return;
 
-    this.velocity.x = newVx;
-    this.velocity.z = newVz;
+    if (v == 0) {
+      console.log("stop");
+      this.velocity.x = this.velocity.x - this.velocity.x * 0.05;
+      this.velocity.z = this.velocity.z - this.velocity.z * 0.05;
+    }
+    else {
+      this.velocity.x = newVx;
+      this.velocity.z = newVz;
+    }
+
+    
 
     this.tilt = v > 0 ? Math.PI / 18 : (v < 0 ? -Math.PI / 18 : 0);
   }
@@ -143,7 +191,7 @@ export class MyHeli extends CGFobject {
   update(deltaTime) {
     let dt = deltaTime / 1000;
   
-    if (this.isFlying) {
+    if (this.heliState == HeliState.FLYING) {
       this.x += this.velocity.x * dt;
       this.z += this.velocity.z * dt;
     }
@@ -153,20 +201,40 @@ export class MyHeli extends CGFobject {
     } else if (this.y > this.targetAltitude) {
       this.y = Math.max(this.y - this.altitudeSpeed * dt, this.targetAltitude);
     }
+
     if (this.y == this.cruiseAltitude) {
-      this.isFlying = true;
+      this.heliState = HeliState.FLYING;
     }
     else {
-      this.isFlying = false;
+      this.heliState = HeliState.LANDED;
     }
   }  
 
   display() {
     this.scene.pushMatrix();
 
+      // Translate to the helicopter's position
       this.scene.translate(this.x, this.y, this.z);
       this.scene.rotate(this.orientation, 0, 1, 0);
       this.scene.rotate(this.tilt, 0, 0, 1);
+
+      if (this.heliState == HeliState.FLYING || this.heliState == HeliState.REFFILLING) {
+        this.scene.pushMatrix();
+          this.scene.translate(0, -this.bucketCableLength + this.landingGearHeight, 0);
+          this.scene.rotate(-Math.PI / 2, 1, 0, 0);
+          this.bucketCableTex.apply();
+          this.bucketCable.display();
+        this.scene.popMatrix();
+
+        this.scene.pushMatrix();
+          this.scene.translate(0, -this.bucketCableLength -this.bucketHeight + this.landingGearHeight, 0);
+          this.scene.rotate(-Math.PI / 2, 1, 0, 0);
+          this.bucketCapTexEmpty.apply();
+          this.bucketCap.display();
+          this.bucketTex.apply();
+          this.bucket.display();
+        this.scene.popMatrix();
+      }
 
       // Draw the helicopter body
       this.scene.pushMatrix();
