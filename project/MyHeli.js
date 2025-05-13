@@ -11,6 +11,7 @@ export const HeliState = Object.freeze({
   TAKING_OFF: 'TAKING_OFF',
   FLYING: 'FLYING',
   LANDING: 'LANDING',
+  RETURNING: 'RETURNING',
   REFFILLING: 'REFILLING'
 });
 
@@ -187,13 +188,59 @@ export class MyHeli extends CGFobject {
     this.tilt = v > 0 ? Math.PI / 18 : (v < 0 ? -Math.PI / 18 : 0);
   }
 
+  returnToHeliport() {
+    const heliportX = 100;
+    const heliportZ = -100;
+    const heliportY = 48;
+    
+    if (Math.abs(this.x - heliportX) < 1 && Math.abs(this.z - heliportZ) < 1) {
+      this.targetAltitude = heliportY;
+      this.heliState = HeliState.LANDING;
+      this.velocity = { x: 0, z: 0 };
+      this.tilt = 0;
+      return;
+    }
+    
+    this.targetAltitude = this.cruiseAltitude;
+    
+    const dx = heliportX - this.x;
+    const dz = heliportZ - this.z;
+    
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    
+    const dirX = dx / distance;
+    const dirZ = dz / distance;
+    
+    const targetAngle = Math.atan2(dirZ, -dirX);
+    
+    this.orientation = targetAngle;
+    
+    this.velocity.x = this.maxSpeed * dirX;
+    this.velocity.z = this.maxSpeed * dirZ;
+    
+    this.heliState = HeliState.RETURNING;
+  }
 
   update(deltaTime) {
     let dt = deltaTime / 1000;
-  
-    if (this.heliState == HeliState.FLYING) {
+    
+    const heliportX = 100;
+    const heliportZ = -100;
+    const heliportY = 48;
+    
+    if (this.heliState == HeliState.FLYING || this.heliState == HeliState.RETURNING) {
       this.x += this.velocity.x * dt;
       this.z += this.velocity.z * dt;
+      
+      if (this.heliState == HeliState.RETURNING && 
+          Math.abs(this.x - heliportX) < 1 && 
+          Math.abs(this.z - heliportZ) < 1 && 
+          Math.abs(this.y - this.cruiseAltitude) < 1) {
+        this.targetAltitude = heliportY;
+        this.heliState = HeliState.LANDING;
+        this.velocity = { x: 0, z: 0 };
+        this.tilt = 0;
+      }
     }
   
     if (this.y < this.targetAltitude) {
@@ -201,14 +248,14 @@ export class MyHeli extends CGFobject {
     } else if (this.y > this.targetAltitude) {
       this.y = Math.max(this.y - this.altitudeSpeed * dt, this.targetAltitude);
     }
-
-    if (this.y == this.cruiseAltitude) {
+  
+    if (this.y == this.cruiseAltitude && 
+        (this.heliState != HeliState.LANDING && this.heliState != HeliState.RETURNING)) {
       this.heliState = HeliState.FLYING;
-    }
-    else {
+    } else if (this.y == heliportY && this.heliState == HeliState.LANDING) {
       this.heliState = HeliState.LANDED;
     }
-  }  
+  }
 
   display() {
     this.scene.pushMatrix();
@@ -218,7 +265,7 @@ export class MyHeli extends CGFobject {
       this.scene.rotate(this.orientation, 0, 1, 0);
       this.scene.rotate(this.tilt, 0, 0, 1);
 
-      if (this.heliState == HeliState.FLYING || this.heliState == HeliState.REFFILLING) {
+      if (this.heliState == HeliState.FLYING || this.heliState == HeliState.REFFILLING || this.heliState == HeliState.RETURNING) {
         this.scene.pushMatrix();
           this.scene.translate(0, -this.bucketCableLength + this.landingGearHeight, 0);
           this.scene.rotate(-Math.PI / 2, 1, 0, 0);

@@ -5,7 +5,7 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./MyTree.js";
 import { MyForest } from "./MyForest.js";
 import { MyBuilding } from './MyBuilding.js';
-import { MyHeli } from './MyHeli.js';
+import { MyHeli, HeliState } from './MyHeli.js';
 
 /**
  * MyScene
@@ -137,9 +137,17 @@ export class MyScene extends CGFscene {
     }
     
     if (this.gui.isKeyPressed("KeyL")) {
-      this.helicopter.tilt = 0;
-      this.helicopter.targetAltitude = 0;
-      this.helicopter.velocity = { x: 0, z: 0 };
+      if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
+        if (this.helicopter.heliState !== HeliState.RETURNING && 
+          this.helicopter.heliState !== HeliState.LANDING) {
+          this.helicopter.returnToHeliport();
+        }
+      } else {
+        this.helicopter.tilt = 0;
+        this.helicopter.targetAltitude = 48;
+        this.helicopter.velocity = { x: 0, z: 0 };
+        this.helicopter.heliState = HeliState.LANDING;
+      }
     }
   }
 
@@ -154,6 +162,7 @@ export class MyScene extends CGFscene {
     this.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.setShininess(10.0);
   }
+  
   display() {
     // ---- BEGIN Background, camera and axis setup
     // Clear image and depth buffer everytime we update the scene
@@ -194,7 +203,6 @@ export class MyScene extends CGFscene {
     this.pushMatrix();
       //this.tree.display(); // Display the tree
     this.popMatrix();
-      
 
     this.pushMatrix();
       this.translate(100, 0, -100);
