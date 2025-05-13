@@ -103,7 +103,6 @@ export class MyScene extends CGFscene {
   */
 
   checkKeys() {
-    
     if (this.gui.isKeyPressed("KeyW")) {
       this.helicopter.accelerate(0.5 * this.speedFactor);
       console.log("accelerate");
@@ -132,11 +131,22 @@ export class MyScene extends CGFscene {
     }
   
     if (this.gui.isKeyPressed("KeyP")) {
-      console.log("Cruise altitude: " + this.helicopter.y);
+      if (this.helicopter.heliState === HeliState.LANDING) {
+        return;
+      }
+
+      if (this.helicopter.heliState === HeliState.LANDED) {
+        this.helicopter.heliState = HeliState.TAKING_OFF;
+      }
+
       this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
     }
     
     if (this.gui.isKeyPressed("KeyL")) {
+      if (this.helicopter.heliState === HeliState.TAKING_OFF) {
+        return;
+      }
+
       if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
         if (this.helicopter.heliState !== HeliState.RETURNING && 
           this.helicopter.heliState !== HeliState.LANDING) {
