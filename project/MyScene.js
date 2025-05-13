@@ -127,9 +127,13 @@ export class MyScene extends CGFscene {
       this.helicopter.velocity = { x: 0, z: 0 };
       this.helicopter.orientation = 0;
       this.helicopter.tilt = 0;
+      this.helicopter.currentRotorSpeed = 0;
+      this.helicopter.mainRotorAngle = 0;
+      this.helicopter.tailRotorAngle = 0;
       this.helicopter.targetAltitude = 48;
+      this.helicopter.heliState = HeliState.LANDED;
     }
-  
+
     if (this.gui.isKeyPressed("KeyP")) {
       if (this.helicopter.heliState === HeliState.LANDING) {
         return;
