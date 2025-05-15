@@ -58,7 +58,6 @@ export class MyCone extends CGFobject {
                 var current = i * this.slices + j;
                 var next = (j + 1) % this.slices + i * this.slices;
 
-                // Corrected winding order for side faces
                 this.indices.push(current, current + this.slices, next);
                 this.indices.push(next, current + this.slices, next + this.slices);
             }

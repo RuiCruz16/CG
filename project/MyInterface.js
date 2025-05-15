@@ -19,6 +19,8 @@ export class MyInterface extends CGFinterface {
 
         this.gui.add(this.scene, 'displayNormals').name("Display normals");
 
+        this.gui.add(this.scene, 'speedFactor', 0.1, 3).name('Speed Factor');
+
         this.initKeys();
 
         return true;

@@ -5,6 +5,7 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyTree } from "./MyTree.js";
 import { MyForest } from "./MyForest.js";
 import { MyBuilding } from './MyBuilding.js';
+import { MyHeli, HeliState } from './MyHeli.js';
 
 /**
  * MyScene
@@ -56,12 +57,14 @@ export class MyScene extends CGFscene {
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
     this.tree = new MyTree(this, 30, 5, Math.PI/4, 'z', [0.0, 1.0, 0.0]);
-    this.forest = new MyForest(this, 4, 4); 
+    this.forest = new MyForest(this, 4, 4);
+    this.helicopter = new MyHeli(this);
 
 
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
     this.displayNormals = false;
+    this.speedFactor = 1;
   }
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
@@ -78,6 +81,8 @@ export class MyScene extends CGFscene {
       vec3.fromValues(0, 0, 0)
     );
   }
+
+  /*
   checkKeys() {
     var text = "Keys pressed: ";
     var keysPressed = false;
@@ -95,9 +100,74 @@ export class MyScene extends CGFscene {
     if (keysPressed)
       console.log(text);
   }
+  */
+
+  checkKeys() {
+    if (this.gui.isKeyPressed("KeyW")) {
+      this.helicopter.accelerate(0.5 * this.speedFactor);
+      console.log("accelerate");
+    }
+  
+    if (this.gui.isKeyPressed("KeyS"))
+      this.helicopter.accelerate(-0.5 * this.speedFactor);
+
+    if (!this.gui.isKeyPressed("KeyW") && !this.gui.isKeyPressed("KeyS"))
+      this.helicopter.accelerate(0);
+  
+    if (this.gui.isKeyPressed("KeyA"))
+      this.helicopter.turn(0.1 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyD"))
+      this.helicopter.turn(-0.1 * this.speedFactor);
+  
+    if (this.gui.isKeyPressed("KeyR")) {
+      this.helicopter.x = 100;
+      this.helicopter.z = -100;
+      this.helicopter.y = 48;
+      this.helicopter.velocity = { x: 0, z: 0 };
+      this.helicopter.orientation = 0;
+      this.helicopter.tilt = 0;
+      this.helicopter.currentRotorSpeed = 0;
+      this.helicopter.mainRotorAngle = 0;
+      this.helicopter.tailRotorAngle = 0;
+      this.helicopter.targetAltitude = 48;
+      this.helicopter.heliState = HeliState.LANDED;
+    }
+
+    if (this.gui.isKeyPressed("KeyP")) {
+      if (this.helicopter.heliState === HeliState.LANDING) {
+        return;
+      }
+
+      if (this.helicopter.heliState === HeliState.LANDED) {
+        this.helicopter.heliState = HeliState.TAKING_OFF;
+      }
+
+      this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
+    }
+    
+    if (this.gui.isKeyPressed("KeyL")) {
+      if (this.helicopter.heliState === HeliState.TAKING_OFF) {
+        return;
+      }
+
+      if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
+        if (this.helicopter.heliState !== HeliState.RETURNING && 
+          this.helicopter.heliState !== HeliState.LANDING) {
+          this.helicopter.returnToHeliport();
+        }
+      } else {
+        this.helicopter.tilt = 0;
+        this.helicopter.targetAltitude = 48;
+        this.helicopter.velocity = { x: 0, z: 0 };
+        this.helicopter.heliState = HeliState.LANDING;
+      }
+    }
+  }
 
   update(t) {
     this.checkKeys();
+    this.helicopter.update(this.updatePeriod); 
   }
 
   setDefaultAppearance() {
@@ -106,6 +176,7 @@ export class MyScene extends CGFscene {
     this.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.setShininess(10.0);
   }
+  
   display() {
     // ---- BEGIN Background, camera and axis setup
     // Clear image and depth buffer everytime we update the scene
@@ -116,6 +187,7 @@ export class MyScene extends CGFscene {
     this.loadIdentity();
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
+    this.lights[0].update();
 
     // Draw axis
     //this.axis.display();
@@ -124,13 +196,20 @@ export class MyScene extends CGFscene {
       this.building.centerModule.enableNormalViz();
       this.building.leftModule.enableNormalViz();
       this.building.rightModule.enableNormalViz();
+      this.helicopter.tailRotor.enableNormalViz();
     } else {
       this.building.centerModule.disableNormalViz();
       this.building.leftModule.disableNormalViz();
       this.building.rightModule.disableNormalViz();
+      this.helicopter.tailRotor.disableNormalViz();
     }    
 
     this.setDefaultAppearance();
+
+    this.pushMatrix();
+      //this.translate(100, 48, -100);
+      this.helicopter.display(); // Display the helicopter
+    this.popMatrix();
 
     this.pushMatrix();
       this.forest.display(); // Display the forest of trees
@@ -139,7 +218,6 @@ export class MyScene extends CGFscene {
     this.pushMatrix();
       //this.tree.display(); // Display the tree
     this.popMatrix();
-      
 
     this.pushMatrix();
       this.translate(100, 0, -100);

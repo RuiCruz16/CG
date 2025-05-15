@@ -28,7 +28,7 @@ export class MyForest extends CGFobject {
                 let trunkRadius = Math.random() * 4 + 1; 
                 let tiltAngle = Math.random() * Math.PI / 10;
                 let rotationAxis = Math.random() < 0.5 ? 'x' : 'z';
-                let color = [Math.random(), Math.random(), Math.random()];
+                let color = [0, Math.random(), 0];
                 this.trees[i][j] = new MyTree(this.scene, trunkHeight, trunkRadius, tiltAngle, rotationAxis, color);
 
                 // Randomly place the trees in the forest
