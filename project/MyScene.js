@@ -187,6 +187,7 @@ export class MyScene extends CGFscene {
     this.loadIdentity();
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
+    this.lights[0].update();
 
     // Draw axis
     //this.axis.display();

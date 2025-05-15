@@ -27,7 +27,15 @@ export class MyRectangularPrism extends CGFobject {
             -halfLength, -halfHeight, halfWidth,   // Vertex 4
             halfLength, -halfHeight, halfWidth,    // Vertex 5
             halfLength, halfHeight, halfWidth,     // Vertex 6
-            -halfLength, halfHeight, halfWidth     // Vertex 7
+            -halfLength, halfHeight, halfWidth,     // Vertex 7
+            -halfLength, -halfHeight, -halfWidth,  // Vertex 0
+            halfLength, -halfHeight, -halfWidth,   // Vertex 1
+            halfLength, halfHeight, -halfWidth,    // Vertex 2
+            -halfLength, halfHeight, -halfWidth,   // Vertex 3
+            -halfLength, -halfHeight, halfWidth,   // Vertex 4
+            halfLength, -halfHeight, halfWidth,    // Vertex 5
+            halfLength, halfHeight, halfWidth,     // Vertex 6
+            -halfLength, halfHeight, halfWidth,     // Vertex 7
         ];
     
         this.normals = [
@@ -39,6 +47,14 @@ export class MyRectangularPrism extends CGFobject {
             0, 1, 1,   // Vertex 5
             0, 1, 1,   // Vertex 6
             0, 1, 1,    // Vertex 7
+            0, -1, -1,  // Vertex 0
+            0, -1, -1,  // Vertex 1
+            0, -1, -1,  // Vertex 2
+            0, -1, -1,  // Vertex 3
+            0, -1, 1,   // Vertex 4
+            0, -1, 1,   // Vertex 5
+            0, -1, 1,   // Vertex 6
+            0, -1, 1,    // Vertex 7
         ];
     
         this.texCoords = [
