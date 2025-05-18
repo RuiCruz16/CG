@@ -8,18 +8,7 @@ export class MyTriangle extends CGFobject {
         this.rotationAngle = rotationAngle;
         this.translationZ = translationZ;
 
-        this.initMaterials();
         this.initBuffers();
-    }
-
-    initMaterials() {
-        // Triangle texture
-        this.triangleTex = new CGFappearance(this.scene);
-        this.triangleTex.setAmbient(0.6, 0.3, 0.1, 1.0);
-        this.triangleTex.setDiffuse(0.9, 0.4, 0.1, 1.0);
-        this.triangleTex.setSpecular(1.0, 0.6, 0.2, 1.0);
-        this.triangleTex.setShininess(10);
-        this.triangleTex.loadTexture('images/fire.jpg');
     }
 
     initBuffers() {
@@ -72,7 +61,6 @@ export class MyTriangle extends CGFobject {
         this.scene.pushMatrix();
             this.scene.rotate(this.rotationAngle, 0, 1, 0);
             this.scene.translate(0, 0, this.translationZ);
-            this.triangleTex.apply();
             super.display();
         this.scene.popMatrix();
     }
