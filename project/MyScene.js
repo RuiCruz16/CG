@@ -6,6 +6,8 @@ import { MyTree } from "./MyTree.js";
 import { MyForest } from "./MyForest.js";
 import { MyBuilding } from './MyBuilding.js';
 import { MyHeli, HeliState } from './MyHeli.js';
+import { MyFire } from './MyFire.js';
+import { MyLake } from './MyLake.js';
 
 /**
  * MyScene
@@ -57,21 +59,27 @@ export class MyScene extends CGFscene {
     this.sphere = new MySphere(this, 50, 50);
     this.panorama = new MyPanorama(this, 'images/panorama.jpg');
     this.tree = new MyTree(this, 30, 5, Math.PI/4, 'z', [0.0, 1.0, 0.0]);
-    this.forest = new MyForest(this, 4, 4);
+    this.forest = new MyForest(this, 4, 4, 20);
     this.helicopter = new MyHeli(this);
 
 
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
+    this.fire = new MyFire(this, 5, 10, -20, 20);
+
+    this.lake = new MyLake(this, -50, -50, 50);
+
     this.displayNormals = false;
     this.speedFactor = 1;
   }
+
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
     this.lights[0].enable();
     this.lights[0].update();
   }
+
   initCameras() {
     this.camera = new CGFcamera(
       Math.PI / 3,
@@ -105,7 +113,6 @@ export class MyScene extends CGFscene {
   checkKeys() {
     if (this.gui.isKeyPressed("KeyW")) {
       this.helicopter.accelerate(0.5 * this.speedFactor);
-      console.log("accelerate");
     }
   
     if (this.gui.isKeyPressed("KeyS"))
@@ -135,7 +142,7 @@ export class MyScene extends CGFscene {
     }
 
     if (this.gui.isKeyPressed("KeyP")) {
-      if (this.helicopter.heliState === HeliState.LANDING) {
+      if (this.helicopter.heliState === HeliState.LANDING || this.helicopter.heliState === HeliState.REFFILLING) {
         return;
       }
 
@@ -147,20 +154,36 @@ export class MyScene extends CGFscene {
     }
     
     if (this.gui.isKeyPressed("KeyL")) {
-      if (this.helicopter.heliState === HeliState.TAKING_OFF) {
+      if (this.helicopter.heliState === HeliState.TAKING_OFF || this.helicopter.heliState === HeliState.REFFILLING) {
         return;
       }
 
-      if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
+      if (this.lake.isPointAboveLake(this.helicopter.x, this.helicopter.z) && this.helicopter.heliState !== HeliState.REFFILLING && !this.helicopter.bucketIsFull) {
+        this.helicopter.heliState = HeliState.REFFILLING;
+        this.helicopter.targetAltitude = 0;
+        this.helicopter.velocity = { x: 0, z: 0 };
+        this.helicopter.tilt = 0;
+        this.helicopter.collectWater();
+      }
+      else if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
         if (this.helicopter.heliState !== HeliState.RETURNING && 
           this.helicopter.heliState !== HeliState.LANDING) {
           this.helicopter.returnToHeliport();
         }
-      } else {
+      }
+      else if (Math.abs(this.helicopter.x - 100) < 1 && Math.abs(this.helicopter.z - (-100)) < 1) {
         this.helicopter.tilt = 0;
         this.helicopter.targetAltitude = 48;
         this.helicopter.velocity = { x: 0, z: 0 };
         this.helicopter.heliState = HeliState.LANDING;
+      }
+    }
+
+    if (this.gui.isKeyPressed("KeyO")) {
+      if (this.helicopter.heliState === HeliState.FLYING && this.helicopter.bucketIsFull && this.fire.isPointAboveFire(this.helicopter.x, this.helicopter.z)) {
+        console.log("Extinguishing fire");
+        this.fire.extinguish();
+        this.helicopter.bucketIsFull = false;
       }
     }
   }
@@ -205,6 +228,14 @@ export class MyScene extends CGFscene {
     }    
 
     this.setDefaultAppearance();
+
+    this.pushMatrix();
+      this.lake.display(); // Display the lake
+    this.popMatrix();
+    
+    this.pushMatrix();
+      this.fire.display();
+    this.popMatrix();
 
     this.pushMatrix();
       //this.translate(100, 48, -100);
