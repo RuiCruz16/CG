@@ -3,7 +3,7 @@ import { MyCone } from './MyCone.js';
 import { MyTriangle } from './MyTriangle.js';
 
 export class MyFire extends CGFobject {
-    constructor(scene, width, height) {
+    constructor(scene, width, height, x, z) {
         super(scene);
         this.scene = scene;
         
@@ -14,6 +14,9 @@ export class MyFire extends CGFobject {
 
         this.flames = [];
         this.numFlames = 10;
+
+        this.x = x;
+        this.z = z;
         
         this.initBuffers();
     }
@@ -34,7 +37,7 @@ export class MyFire extends CGFobject {
         this.fireTex.setDiffuse(0.9, 0.4, 0.1, 1.0);
         this.fireTex.setSpecular(1.0, 0.6, 0.2, 1.0);
         this.fireTex.setShininess(10);
-        this.fireTex.loadTexture('images/fire.jpg');
+        this.fireTex.loadTexture('images/fire1.jpg');
     }
     
     extinguish() {
@@ -44,9 +47,15 @@ export class MyFire extends CGFobject {
         }
         return false;
     }
+
+    isPointAboveFire(x, z) {
+        return (x >= this.x - 10 && x <= this.x + 10 &&
+                z >= this.z - 10 && z <= this.z + 10);
+    }
     
     display() {
         this.scene.pushMatrix();
+            this.scene.translate(this.x, 0, this.z);
             this.fireTex.apply();
 
             if (this.active) {

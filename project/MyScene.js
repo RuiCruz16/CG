@@ -65,7 +65,7 @@ export class MyScene extends CGFscene {
 
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
-    this.fire = new MyFire(this, 5, 10);
+    this.fire = new MyFire(this, 5, 10, -20, 20);
 
     this.lake = new MyLake(this, -50, -50, 50);
 
@@ -154,7 +154,6 @@ export class MyScene extends CGFscene {
     }
     
     if (this.gui.isKeyPressed("KeyL")) {
-      console.log(this.helicopter.heliState);
       if (this.helicopter.heliState === HeliState.TAKING_OFF || this.helicopter.heliState === HeliState.REFFILLING) {
         return;
       }
@@ -167,17 +166,24 @@ export class MyScene extends CGFscene {
         this.helicopter.collectWater();
       }
       else if (Math.abs(this.helicopter.x - 100) > 1 || Math.abs(this.helicopter.z - (-100)) > 1) {
-        console.log("Returning to heliport");
         if (this.helicopter.heliState !== HeliState.RETURNING && 
           this.helicopter.heliState !== HeliState.LANDING) {
           this.helicopter.returnToHeliport();
         }
-      } 
+      }
       else if (Math.abs(this.helicopter.x - 100) < 1 && Math.abs(this.helicopter.z - (-100)) < 1) {
         this.helicopter.tilt = 0;
         this.helicopter.targetAltitude = 48;
         this.helicopter.velocity = { x: 0, z: 0 };
         this.helicopter.heliState = HeliState.LANDING;
+      }
+    }
+
+    if (this.gui.isKeyPressed("KeyO")) {
+      if (this.helicopter.heliState === HeliState.FLYING && this.helicopter.bucketIsFull && this.fire.isPointAboveFire(this.helicopter.x, this.helicopter.z)) {
+        console.log("Extinguishing fire");
+        this.fire.extinguish();
+        this.helicopter.bucketIsFull = false;
       }
     }
   }

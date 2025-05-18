@@ -74,7 +74,6 @@ export class MyHeli extends CGFobject {
     this.mainRotor = new MyRectangularPrism(this.scene, this.mainRotorLength, this.mainRotorHeight, this.mainRotorWidth);
     this.mainRotorExtension = new MyCylinder(this.scene, 20, 1, this.tailLength/2, this.tailHeight/2);
     this.mainRotorConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/6, this.bodyHeight/8, this.bodyLength/6);
-    //this.tail = new MyRectangularPrism(this.scene, this.tailLength, this.tailHeight, this.tailHeight);
     this.tailRotor = new MyRectangularPrism(this.scene, this.tailRotorLength, this.tailRotorHeight, this.tailRotorWidth);
     this.tail = new MyCylinder(this.scene, 20, 1, this.tailLength, this.tailHeight);
     this.tailConnection = new MyEllipsoid(this.scene, 50, 20, this.bodyLength/4, this.bodyHeight/3, this.bodyLength/5);
@@ -84,6 +83,7 @@ export class MyHeli extends CGFobject {
     this.bucket = new MyCylinderWTopCap(this.scene, 20, 1, this.bucketHeight, this.bucketRadius);
     this.bucketCap = new MyCylinder(this.scene, 20, 1, this.bucketHeight, this.bucketRadius);
     this.bucketCable = new MyCylinder(this.scene, 20, 1, this.bucketCableLength, this.bucketRadius/12);
+    this.water = new MyEllipsoid(this.scene, 50, 20, 10, 10, 10);
 
     this.initTextures();
   }
@@ -142,6 +142,7 @@ export class MyHeli extends CGFobject {
     this.bucketCableTex.setSpecular(0.2, 0.2, 0.2, 1);
     this.bucketCableTex.setShininess(10);
     this.bucketCableTex.loadTexture('images/cable.jpg');
+
   }
 
   turn(v) {
@@ -232,6 +233,8 @@ export class MyHeli extends CGFobject {
     const heliportX = 100;
     const heliportZ = -100;
     const heliportY = 48;
+
+    console.log(this.heliState);
     
     if (this.heliState == HeliState.FLYING || this.heliState == HeliState.RETURNING) {
       this.x += this.velocity.x * dt;
@@ -311,7 +314,7 @@ export class MyHeli extends CGFobject {
 
   collectWater() {
 
-    if (Math.abs(this.y - this.targetAltitude) < 1) {
+    if (Math.abs(this.y - this.targetAltitude) <= this.refillHeight) {
       this.heliState = HeliState.REFFILLING;
       this.bucketIsFull = true;
       this.targetAltitude = this.cruiseAltitude;
