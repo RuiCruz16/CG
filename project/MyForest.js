@@ -10,10 +10,11 @@ import { MyTree } from './MyTree.js';
 */
 
 export class MyForest extends CGFobject {
-    constructor(scene, row, col) {
+    constructor(scene, row, col, spacing) {
         super(scene);
         this.row = row;
         this.col = col;
+        this.spacing = spacing;
         this.trees = [];
         this.offsets = [];
         this.initBuffers();
@@ -41,7 +42,6 @@ export class MyForest extends CGFobject {
     }
 
     display() {
-        const spacing = 30; // Increase spacing between trees
         for (let i = 0; i < this.row; i++) {
             for (let j = 0; j < this.col; j++) {
                 this.scene.pushMatrix();
@@ -49,7 +49,7 @@ export class MyForest extends CGFobject {
                     let offsetX = this.offsets[i][j].offsetX;
                     let offsetZ = this.offsets[i][j].offsetZ;
 
-                    this.scene.translate(i * spacing + offsetX, 0, j * spacing + offsetZ);
+                    this.scene.translate(i * this.spacing + offsetX, 0, j * this.spacing + offsetZ);
                     this.trees[i][j].display();
                 this.scene.popMatrix();
             }
