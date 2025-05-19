@@ -145,7 +145,7 @@ export class MyScene extends CGFscene {
     }
 
     if (this.gui.isKeyPressed("KeyP")) {
-      if (this.helicopter.heliState === HeliState.LANDING || this.helicopter.heliState === HeliState.REFFILLING) {
+      if (this.helicopter.heliState === HeliState.LANDING) {
         return;
       }
 
