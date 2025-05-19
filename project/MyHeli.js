@@ -233,8 +233,6 @@ export class MyHeli extends CGFobject {
     const heliportX = 100;
     const heliportZ = -100;
     const heliportY = 48;
-
-    console.log(this.heliState);
     
     if (this.heliState == HeliState.FLYING || this.heliState == HeliState.RETURNING) {
       this.x += this.velocity.x * dt;
@@ -251,11 +249,7 @@ export class MyHeli extends CGFobject {
       }
     }
 
-    if (this.heliState == HeliState.REFFILLING && this.y == this.refillHeight) {
-      this.targetAltitude = this.cruiseAltitude;
-      this.heliState = HeliState.REFFILLING;
-      this.velocity = { x: 0, z: 0 };
-      this.tilt = 0;
+    if (this.heliState == HeliState.REFFILLING && Math.abs(this.y - this.refillHeight) < 0.1) {
       this.bucketIsFull = true;
     }
 
@@ -314,10 +308,9 @@ export class MyHeli extends CGFobject {
 
   collectWater() {
 
-    if (Math.abs(this.y - this.targetAltitude) <= this.refillHeight) {
+    if (Math.abs(this.y - this.refillHeight) < 0.1) {
       this.heliState = HeliState.REFFILLING;
       this.bucketIsFull = true;
-      this.targetAltitude = this.cruiseAltitude;
       this.velocity = { x: 0, z: 0 };
       this.tilt = 0;
     }
