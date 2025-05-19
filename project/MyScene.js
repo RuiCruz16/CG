@@ -8,6 +8,7 @@ import { MyBuilding } from './MyBuilding.js';
 import { MyHeli, HeliState } from './MyHeli.js';
 import { MyFire } from './MyFire.js';
 import { MyLake } from './MyLake.js';
+import { MyWaterDrop } from './MyWaterDrop.js';
 
 /**
  * MyScene
@@ -68,6 +69,8 @@ export class MyScene extends CGFscene {
     this.fire = new MyFire(this, 4, 4, 20, 0.8);
 
     this.lake = new MyLake(this, -50, -100, 50);
+
+    this.waterDrop = null;
 
     this.displayNormals = false;
     this.speedFactor = 1;
@@ -180,17 +183,31 @@ export class MyScene extends CGFscene {
     }
 
     if (this.gui.isKeyPressed("KeyO")) {
-      if (this.helicopter.heliState === HeliState.FLYING && this.helicopter.bucketIsFull && this.fire.isPointAboveFire(this.helicopter.x, this.helicopter.z)) {
-        console.log("Extinguishing fire");
-        this.fire.extinguish();
-        this.helicopter.bucketIsFull = false;
-      }
+      if (this.helicopter.heliState === HeliState.FLYING && 
+        this.helicopter.bucketIsFull && 
+        this.fire.isPointAboveFire(this.helicopter.x, this.helicopter.z) &&
+        this.waterDrop === null) {
+      
+      const bucketY = this.helicopter.y - this.helicopter.bucketCableLength - this.helicopter.bucketHeight + this.helicopter.landingGearHeight;
+      
+      this.waterDrop = new MyWaterDrop(this, this.helicopter.x, bucketY, this.helicopter.z);
+      
+      this.helicopter.bucketIsFull = false;
+    }
     }
   }
 
   update(t) {
     this.checkKeys();
-    this.helicopter.update(this.updatePeriod); 
+    this.helicopter.update(this.updatePeriod);
+    
+    if (this.waterDrop !== null) {
+      this.waterDrop.update(this.updatePeriod);
+      
+      if (!this.waterDrop.active) {
+        this.waterDrop = null;
+      }
+    }
   }
 
   setDefaultAppearance() {
@@ -228,6 +245,12 @@ export class MyScene extends CGFscene {
     }    
 
     this.setDefaultAppearance();
+
+    this.pushMatrix();
+      if (this.waterDrop !== null) {
+        this.waterDrop.display();
+      }
+    this.popMatrix();
 
     this.pushMatrix();
       this.lake.display(); // Display the lake
