@@ -65,9 +65,9 @@ export class MyScene extends CGFscene {
 
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
 
-    this.fire = new MyFire(this, 5, 10, -20, 20);
+    this.fire = new MyFire(this, 4, 4, 20, 0.8);
 
-    this.lake = new MyLake(this, -50, -50, 50);
+    this.lake = new MyLake(this, -50, -100, 50);
 
     this.displayNormals = false;
     this.speedFactor = 1;

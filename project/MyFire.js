@@ -1,36 +1,24 @@
-import { CGFobject, CGFappearance, CGFtexture } from '../lib/CGF.js';
-import { MyTriangle } from './MyTriangle.js';
+import { CGFobject } from '../lib/CGF.js';
+import { MyFlame } from './MyFlame.js';
 
 export class MyFire extends CGFobject {
-    constructor(scene, width, height, x, z) {
+    constructor(scene, forestRows, forestCols, forestSpacing, density) {
         super(scene);
         this.scene = scene;
         
-        this.width = width;
-        this.height = height;
-        this.active = true;
-        this.x = x;
-        this.z = z;
+        this.forestRows = forestRows;
+        this.forestCols = forestCols;
+        this.forestSpacing = forestSpacing;
         
-        this.outerFlames = [];
-        this.middleFlames = [];
-        this.innerFlames = [];
+        this.density = density;
+        this.flames = [];
+        this.active = true;
         
         this.initBuffers();
     }
     
     initBuffers() {
-        this.initMaterials();
         this.createFlames();
-    }
-
-    initMaterials() {
-        this.fireTex = new CGFappearance(this.scene);
-        this.fireTex.setAmbient(0.6, 0.3, 0.1, 1.0);
-        this.fireTex.setDiffuse(0.9, 0.4, 0.1, 1.0);
-        this.fireTex.setSpecular(1.0, 0.6, 0.2, 1.0);
-        this.fireTex.setShininess(10);
-        this.fireTex.loadTexture('images/fire.jpg');
     }
     
     randomRange(min, max) {
@@ -38,79 +26,69 @@ export class MyFire extends CGFobject {
     }
     
     createFlames() {
-        const numOuterFlames = 8;
-        for (let i = 0; i < numOuterFlames; i++) {
-            const angle = (i / numOuterFlames) * Math.PI * 2 + this.randomRange(-0.2, 0.2);
-            const flameWidth = this.width * this.randomRange(0.7, 0.9);
-            const flameHeight = this.height * this.randomRange(0.5, 0.7);
-            const offset = this.width * 0.4;
+        const forestArea = this.forestRows * this.forestCols;
+        const numFlames = Math.floor(forestArea * this.density);
+        
+        for (let i = 0; i < numFlames; i++) {
+            const row = Math.floor(Math.random() * this.forestRows);
+            const col = Math.floor(Math.random() * this.forestCols);
             
-            this.outerFlames.push(new MyTriangle(this.scene, flameWidth, flameHeight, angle, offset));
+            const offsetX = Math.random() * 10 - 5;
+            const offsetZ = Math.random() * 10 - 5;
+            
+            const x = row * this.forestSpacing + offsetX;
+            const z = col * this.forestSpacing + offsetZ;
+            
+            const flameSize = this.randomRange(0.7, 1.3);
+            const width = 5 * flameSize;
+            const height = 10 * flameSize;
+            
+            this.flames.push(new MyFlame(this.scene, width, height, x, z));
         }
         
-        const numMiddleFlames = 6;
-        for (let i = 0; i < numMiddleFlames; i++) {
-            const angle = (i / numMiddleFlames) * Math.PI * 2 + this.randomRange(-0.3, 0.3);
-            const flameWidth = this.width * this.randomRange(0.5, 0.7);
-            const flameHeight = this.height * this.randomRange(0.7, 0.9);
-            const offset = this.width * 0.2;
+        const numLargeFlames = Math.floor(numFlames * 0.2);
+        for (let i = 0; i < numLargeFlames; i++) {
+            const row = Math.floor(Math.random() * this.forestRows);
+            const col = Math.floor(Math.random() * this.forestCols);
             
-            this.middleFlames.push(new MyTriangle(this.scene, flameWidth, flameHeight, angle, offset));
-        }
-        
-        const numInnerFlames = 4;
-        for (let i = 0; i < numInnerFlames; i++) {
-            const angle = (i / numInnerFlames) * Math.PI * 2 + this.randomRange(-0.4, 0.4);
-            const flameWidth = this.width * this.randomRange(0.3, 0.5);
-            const flameHeight = this.height * this.randomRange(0.9, 1.1);
-            const offset = this.width * 0.1;
+            const offsetX = Math.random() * 10 - 5;
+            const offsetZ = Math.random() * 10 - 5;
             
-            this.innerFlames.push(new MyTriangle(this.scene, flameWidth, flameHeight, angle, offset));
+            const x = row * this.forestSpacing + offsetX;
+            const z = col * this.forestSpacing + offsetZ;
+            
+            const width = this.randomRange(8, 12);
+            const height = this.randomRange(15, 20);
+            
+            this.flames.push(new MyFlame(this.scene, width, height, x, z));
         }
-        
-        this.centralFlame = new MyTriangle(
-            this.scene, 
-            this.width * 0.3,
-            this.height * 1.2,
-            0,
-            0
-        );
     }
     
     extinguish() {
         if (this.active) {
             this.active = false;
+            for (const flame of this.flames) {
+                flame.extinguish();
+            }
             return true;
         }
         return false;
     }
-
+    
     isPointAboveFire(x, z) {
-        return (x >= this.x - 10 && x <= this.x + 10 &&
-                z >= this.z - 10 && z <= this.z + 10);
+        for (const flame of this.flames) {
+            if (flame.isPointAboveFire(x, z)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     display() {
         if (!this.active) return;
         
-        this.scene.pushMatrix();
-            this.scene.translate(this.x, 0, this.z);
-            
-            this.fireTex.apply();
-            for (const flame of this.outerFlames) {
-                flame.display();
-            }
-            
-            for (const flame of this.middleFlames) {
-                flame.display();
-            }
-            
-            for (const flame of this.innerFlames) {
-                flame.display();
-            }
-            
-            this.centralFlame.display();
-        
-        this.scene.popMatrix();
+        for (const flame of this.flames) {
+            flame.display();
+        }
     }
 }

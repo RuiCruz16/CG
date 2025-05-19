@@ -233,8 +233,6 @@ export class MyHeli extends CGFobject {
     const heliportX = 100;
     const heliportZ = -100;
     const heliportY = 48;
-
-    console.log(this.heliState);
     
     if (this.heliState == HeliState.FLYING || this.heliState == HeliState.RETURNING) {
       this.x += this.velocity.x * dt;
