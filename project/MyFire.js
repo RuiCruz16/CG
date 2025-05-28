@@ -1,4 +1,4 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFshader, CGFtexture } from '../lib/CGF.js';
 import { MyFlame } from './MyFlame.js';
 
 export class MyFire extends CGFobject {
@@ -15,6 +15,20 @@ export class MyFire extends CGFobject {
         this.active = true;
         
         this.initBuffers();
+        this.initShaders();
+
+        this.timeFactor = 0;
+        this.fireTexture = new CGFtexture(scene, 'images/fire.jpg');
+    }
+
+    initShaders() {
+        this.fireShader = new CGFshader(
+            this.scene.gl,
+            'shaders/fire.vert',
+            'shaders/fire.frag'
+        );
+
+        this.fireShader.setUniformsValues({ uFireTexture: 0 });
     }
     
     initBuffers() {
@@ -83,12 +97,30 @@ export class MyFire extends CGFobject {
         }
         return false;
     }
+
+    update(t) {
+        if (!this.active) return;
+        
+        this.timeFactor = (t % 10000) / 1000;
+        
+        if (this.fireShader) {
+            this.fireShader.setUniformsValues({ 
+                timeFactor: this.timeFactor
+            });
+        }
+    }
     
     display() {
         if (!this.active) return;
-        
+    
+        this.scene.setActiveShader(this.fireShader);
+        this.fireShader.setUniformsValues({ timeFactor: this.timeFactor });
+        this.fireTexture.bind(0);
+    
         for (const flame of this.flames) {
             flame.display();
         }
+    
+        this.scene.setActiveShader(this.scene.defaultShader);
     }
 }

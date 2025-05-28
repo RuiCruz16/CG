@@ -1,4 +1,4 @@
-import { CGFobject, CGFappearance, CGFtexture } from '../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../lib/CGF.js';
 import { MyTriangle } from './MyTriangle.js';
 
 export class MyFlame extends CGFobject {
@@ -30,7 +30,6 @@ export class MyFlame extends CGFobject {
         this.fireTex.setDiffuse(0.9, 0.4, 0.1, 1.0);
         this.fireTex.setSpecular(1.0, 0.6, 0.2, 1.0);
         this.fireTex.setShininess(10);
-        this.fireTex.loadTexture('images/fire.jpg');
     }
     
     randomRange(min, max) {
@@ -96,7 +95,6 @@ export class MyFlame extends CGFobject {
         this.scene.pushMatrix();
             this.scene.translate(this.x, 0, this.z);
             
-            this.fireTex.apply();
             for (const flame of this.outerFlames) {
                 flame.display();
             }
