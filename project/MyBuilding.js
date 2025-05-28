@@ -27,6 +27,12 @@ export class MyBuilding extends CGFobject {
     this.leftModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, false);
   }
 
+  update(t) {
+    if (this.centerModule) {
+      this.centerModule.update(t);
+    }
+  }
+
   display() {
     this.scene.pushMatrix();
         this.centerModule.display();

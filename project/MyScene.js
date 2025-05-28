@@ -210,6 +210,10 @@ export class MyScene extends CGFscene {
     }
 
     this.fire.update(t);
+
+    if (this.building) {
+      this.building.update(t);
+    }
   }
 
   setDefaultAppearance() {
