@@ -208,6 +208,8 @@ export class MyScene extends CGFscene {
         this.waterDrop = null;
       }
     }
+
+    this.fire.update(t);
   }
 
   setDefaultAppearance() {
