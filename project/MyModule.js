@@ -5,13 +5,15 @@ import { HeliState } from './MyHeli.js';
 import { MySphere } from './MySphere.js';
 
 export class MyModule extends CGFobject {
-  constructor(scene, width, floors, windowsPerFloor, heightPerFloor, windowTexture, buildingColor, isCenter) {
+  constructor(scene, width, floors, windowsPerFloor, heightPerFloor, windowAppearance, doorAppearance, letreiroAppearance, buildingColor, isCenter) {
     super(scene);
     this.width = width;
     this.floors = floors;
     this.windowsPerFloor = windowsPerFloor;
     this.heightPerFloor = heightPerFloor;
-    this.windowTexture = windowTexture;
+    this.windowAppearance = windowAppearance;
+    this.doorAppearance = doorAppearance;
+    this.letreiroAppearance = letreiroAppearance;
     this.buildingColor = buildingColor;
     this.isCenter = isCenter;
 
@@ -138,12 +140,12 @@ export class MyModule extends CGFobject {
           const zPos = this.width / 2 + 0.1;
           const xVariationDoor = (this.width/2) * 0.15;
           const yVariationDoor = this.heightPerFloor / 3;
-          this.elements.push(new MyModuleTexture(this.scene, 'images/door.jpg', 0, yPosDoor, zPos, xVariationDoor, yVariationDoor, false));
+          this.elements.push(new MyModuleTexture(this.scene, this.doorAppearance, 0, yPosDoor, zPos, xVariationDoor, yVariationDoor, false));
 
           const yPosSign = this.heightPerFloor;
           const yVariationSign = this.heightPerFloor / 5;
           const xVariationSign = (this.width/2) * 0.25;
-          this.elements.push(new MyModuleTexture(this.scene, 'images/letreiro.jpg', 0, yPosSign, zPos, xVariationSign, yVariationSign, false));
+          this.elements.push(new MyModuleTexture(this.scene, this.letreiroAppearance, 0, yPosSign, zPos, xVariationSign, yVariationSign, false));
           break;
         } else {
           if (i == this.floors - 1 && this.isCenter) {
@@ -175,7 +177,7 @@ export class MyModule extends CGFobject {
           const zPos = this.width / 2 + 0.1;
           const xVariation = windowWidth / 5;
           const yVariation = this.heightPerFloor / 4;
-          this.elements.push(new MyWindow(this.scene, this.windowTexture, xPos, yPos, zPos, xVariation, yVariation));
+          this.elements.push(new MyWindow(this.scene, this.windowAppearance, xPos, yPos, zPos, xVariation, yVariation));
         }
       }
     }

@@ -1,4 +1,4 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFappearance, CGFtexture } from '../lib/CGF.js';
 import { MyModule } from './MyModule.js';
 
 export class MyBuilding extends CGFobject {
@@ -14,6 +14,19 @@ export class MyBuilding extends CGFobject {
     this.sideModuleWidth = 0.75 * this.centerModuleWidth;
     this.heightPerFloor = this.centerModuleWidth * 0.3;
 
+    this.windowTextureObj = new CGFtexture(scene, windowTexture);
+    this.doorTexture = new CGFtexture(scene, 'images/door.jpg');
+    this.letreiroTexture = new CGFtexture(scene, 'images/letreiro.jpg');
+    
+    this.windowAppearance = new CGFappearance(scene);
+    this.windowAppearance.setTexture(this.windowTextureObj);
+    
+    this.doorAppearance = new CGFappearance(scene);
+    this.doorAppearance.setTexture(this.doorTexture);
+    
+    this.letreiroAppearance = new CGFappearance(scene);
+    this.letreiroAppearance.setTexture(this.letreiroTexture);
+
     this.initBuffers();
   }
 
@@ -22,9 +35,44 @@ export class MyBuilding extends CGFobject {
   }
 
   createModules() {
-    this.centerModule = new MyModule(this.scene, this.centerModuleWidth, this.floors + 1, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, true);
-    this.rightModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, false);
-    this.leftModule = new MyModule(this.scene, this.sideModuleWidth, this.floors, this.windowsPerFloor, this.heightPerFloor, this.windowTexture, this.buildingColor, false);
+    this.centerModule = new MyModule(
+      this.scene, 
+      this.centerModuleWidth, 
+      this.floors + 1, 
+      this.windowsPerFloor, 
+      this.heightPerFloor, 
+      this.windowAppearance,
+      this.doorAppearance,
+      this.letreiroAppearance,
+      this.buildingColor, 
+      true
+    );
+    
+    this.rightModule = new MyModule(
+      this.scene, 
+      this.sideModuleWidth, 
+      this.floors, 
+      this.windowsPerFloor, 
+      this.heightPerFloor, 
+      this.windowAppearance,
+      this.doorAppearance,
+      this.letreiroAppearance,
+      this.buildingColor, 
+      false
+    );
+    
+    this.leftModule = new MyModule(
+      this.scene, 
+      this.sideModuleWidth, 
+      this.floors, 
+      this.windowsPerFloor, 
+      this.heightPerFloor, 
+      this.windowAppearance,
+      this.doorAppearance,
+      this.letreiroAppearance,
+      this.buildingColor, 
+      false
+    );
   }
 
   update(t) {

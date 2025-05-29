@@ -1,9 +1,9 @@
-import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { CGFobject } from '../lib/CGF.js';
 
 export class MyWindow extends CGFobject {
-  constructor(scene, texturePath, xPos, yPos, zPos, xSpacing, ySpacing) {
+  constructor(scene, appearance, xPos, yPos, zPos, xSpacing, ySpacing) {
     super(scene);
-    this.texturePath = texturePath;
+    this.appearance = appearance;
 
     this.xPos = xPos;
     this.yPos = yPos;
@@ -11,8 +11,6 @@ export class MyWindow extends CGFobject {
     this.xSpacing = xSpacing;
     this.ySpacing = ySpacing;
 
-    this.appearance = new CGFappearance(scene);
-    this.appearance.loadTexture(texturePath);
     this.initBuffers();
   }
 

@@ -1,9 +1,16 @@
-import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { CGFobject, CGFtexture, CGFappearance } from '../lib/CGF.js';
 
 export class MyModuleTexture extends CGFobject {
-  constructor(scene, texturePath, xPos, yPos, zPos, xSpacing, ySpacing, isCeiling) {
+  constructor(scene, appearance, xPos, yPos, zPos, xSpacing, ySpacing, isCeiling) {
     super(scene);
-    this.texturePath = texturePath;
+    
+    if (typeof appearance === 'string') {
+      const texture = new CGFtexture(scene, appearance);
+      this.appearance = new CGFappearance(scene);
+      this.appearance.setTexture(texture);
+    } else {
+      this.appearance = appearance;
+    }
 
     this.xPos = xPos;
     this.yPos = yPos;
@@ -12,8 +19,6 @@ export class MyModuleTexture extends CGFobject {
     this.ySpacing = ySpacing;
     this.isCeiling = isCeiling;
 
-    this.appearance = new CGFappearance(scene);
-    this.appearance.loadTexture(texturePath);
     this.initBuffers();
   }
 
