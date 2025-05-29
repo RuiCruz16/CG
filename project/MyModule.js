@@ -2,6 +2,7 @@ import { CGFobject, CGFappearance, CGFtexture, CGFshader } from '../lib/CGF.js';
 import { MyWindow } from './MyWindow.js';
 import { MyModuleTexture } from './MyModuleTexture.js';
 import { HeliState } from './MyHeli.js';
+import { MySphere } from './MySphere.js';
 
 export class MyModule extends CGFobject {
   constructor(scene, width, floors, windowsPerFloor, heightPerFloor, windowTexture, buildingColor, isCenter) {
@@ -20,18 +21,35 @@ export class MyModule extends CGFobject {
     this.appearance.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.appearance.setShininess(10.0);
 
-    this.heliportTexture = new CGFtexture(scene, 'images/heliport.jpg');
-    this.heliportUpTexture = new CGFtexture(scene, 'images/heliport_up.png');
-    this.heliportDownTexture = new CGFtexture(scene, 'images/heliport_down.png');
+    if (isCenter) {
+      this.lightShader = new CGFshader(scene.gl, 'shaders/heliportLight.vert', 'shaders/heliportLight.frag');
+      
+      this.lightShader.setUniformsValues({
+        uTimeFactor: 0,
+        uManeuverType: 0,
+        uBaseColor: [0.7, 0.7, 0.7, 1.0],
+        uEmissiveColor: [1.0, 1.0, 0.2, 1.0]
+      });
+      
+      this.lightAppearance = new CGFappearance(scene);
+      this.lightAppearance.setAmbient(0.2, 0.2, 0.2, 1.0);
+      this.lightAppearance.setDiffuse(0.7, 0.7, 0.7, 1.0);
+      this.lightAppearance.setSpecular(0.5, 0.5, 0.5, 1.0);
+      this.lightAppearance.setShininess(30);
 
-    this.heliportShader = new CGFshader(scene.gl, 'shaders/heliport.vert', 'shaders/heliport.frag');
+      this.heliportTexture = new CGFtexture(scene, 'images/heliport.jpg');
+      this.heliportUpTexture = new CGFtexture(scene, 'images/heliport_up.png');
+      this.heliportDownTexture = new CGFtexture(scene, 'images/heliport_down.png');
 
-    this.heliportShader.setUniformsValues({
-      uSampler: 0,
-      uSamplerAlt: 1,
-      uTimeFactor: 0.0,
-      uManeuverType: 0
-    });
+      this.heliportShader = new CGFshader(scene.gl, 'shaders/heliport.vert', 'shaders/heliport.frag');
+
+      this.heliportShader.setUniformsValues({
+        uSampler: 0,
+        uSamplerAlt: 1,
+        uTimeFactor: 0.0,
+        uManeuverType: 0
+      });
+    }
 
     this.elements = [];
     this.createElements();
@@ -131,6 +149,25 @@ export class MyModule extends CGFobject {
           if (i == this.floors - 1 && this.isCenter) {
             const Variation = (this.width/2) * 0.70;
             this.heliport = new MyModuleTexture(this.scene, 'images/heliport.jpg', 0, this.heightPerFloor * this.floors + 0.1, 0, Variation, Variation, true);
+
+            const lightSize = 0.05 * this.width;
+            const lightPosY = this.heightPerFloor * this.floors;
+            
+            const positions = [
+              [-Variation, lightPosY, -Variation],
+              [Variation, lightPosY, -Variation],
+              [-Variation, lightPosY, Variation],
+              [Variation, lightPosY, Variation]
+            ];
+            
+            this.heliportLights = [];
+            for (let pos of positions) {
+              this.heliportLights.push({
+                object: new MySphere(this.scene, 16, 8, false),
+                position: pos,
+                size: lightSize
+              });
+            }
           }
           
           const xPos = -this.width / 2 + (j + 0.5) * windowWidth;
@@ -159,6 +196,11 @@ export class MyModule extends CGFobject {
     }
     
     this.heliportShader.setUniformsValues({
+      uTimeFactor: timeFactor,
+      uManeuverType: maneuverType
+    });
+
+    this.lightShader.setUniformsValues({
       uTimeFactor: timeFactor,
       uManeuverType: maneuverType
     });
@@ -201,6 +243,25 @@ export class MyModule extends CGFobject {
       this.scene.popMatrix();
       
       this.scene.setActiveShader(currentShader);
+
+      if (this.heliportLights) {
+        const currentShader = this.scene.activeShader;
+        
+        this.scene.setActiveShader(this.lightShader);
+        
+        for (let light of this.heliportLights) {
+          this.scene.pushMatrix();
+            this.scene.translate(light.position[0], light.position[1], light.position[2]);
+            
+            this.scene.scale(light.size, light.size, light.size);
+            
+            this.lightAppearance.apply();
+            light.object.display();
+          this.scene.popMatrix();
+        }
+        
+        this.scene.setActiveShader(currentShader);
+      }
     }
     
     this.scene.pushMatrix();
