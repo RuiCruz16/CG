@@ -25,9 +25,11 @@ void main() {
     vec4 finalColor;
     
     if (uManeuverType == 1) {
-        finalColor = mix(uBaseColor, uEmissiveColor, pulseIntensity);
+        vec4 orangeColor = vec4(1.0, 0.6, 0.2, 1.0);
+        finalColor = mix(uBaseColor, orangeColor, pulseIntensity);
     } else if (uManeuverType == 2) {
-        finalColor = mix(uBaseColor, vec4(1.0, 0.2, 0.2, 1.0), pulseIntensity);
+        vec4 greenColor = vec4(0.2, 0.8, 0.2, 1.0);
+        finalColor = mix(uBaseColor, greenColor, pulseIntensity);
     } else {
         finalColor = uBaseColor;
     }
