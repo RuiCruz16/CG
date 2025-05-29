@@ -1,4 +1,4 @@
-import { CGFobject, CGFappearance } from '../lib/CGF.js';
+import { CGFobject } from '../lib/CGF.js';
 import { MyCone } from './MyCone.js';
 import { MyPyramid } from './MyPyramid.js';
 
@@ -13,32 +13,30 @@ import { MyPyramid } from './MyPyramid.js';
  * @param color - Color of the tree
  */
 export class MyTree extends CGFobject {
-  constructor(scene, trunkHeight, trunkRadius, tiltAngle, rotationAxis, color) {
+  constructor(scene, trunkHeight, trunkRadius, tiltAngle, rotationAxis, color, trunkMaterial, leafMaterial) {
     super(scene);
     this.trunkHeight = trunkHeight;
     this.trunkRadius = trunkRadius;
     this.tiltAngle = tiltAngle;
     this.rotationAxis = rotationAxis;
+
     // Validate color parameter
     if (!Array.isArray(color) || color.length < 3) {
         console.warn("Invalid color provided for MyTree. Using default green color.");
         this.color = [0.0, 1.0, 0.0]; // Default to green
     } else {
         this.color = color;
-    }    
+    }
+
+    this.trunkMaterial = trunkMaterial;
+    this.pyramidMaterial = leafMaterial;
+
     this.initBuffers();
   }
 
   initBuffers() {
     // Tree trunk (cone)
     this.trunk = new MyCone(this.scene, 20, 1, this.trunkHeight, this.trunkRadius);
-    this.trunkMaterial = new CGFappearance(this.scene);
-    this.trunkMaterial.setAmbient(0.5, 0.25, 0.1, 1);
-    this.trunkMaterial.setDiffuse(0.5, 0.25, 0.1, 1);
-    this.trunkMaterial.setSpecular(0.1, 0.1, 0.1, 1);
-    this.trunkMaterial.setShininess(10.0);
-    this.trunkMaterial.loadTexture('images/trunk.jpg');
-    this.trunkMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
     // Tree crown (pyramids)
     this.pyramids = [];
@@ -47,13 +45,6 @@ export class MyTree extends CGFobject {
     let numPyramids = Math.floor(this.trunkHeight / 2);
     let pyramidHeight = treetop / numPyramids; // Adjust height based on number of pyramids
     let pyramidBaseSize = this.trunkRadius * 2; // Base size of the pyramid
-    this.pyramidMaterial = new CGFappearance(this.scene);
-    this.pyramidMaterial.setAmbient(this.color[0], this.color[1], this.color[2], 1);
-    this.pyramidMaterial.setDiffuse(this.color[0], this.color[1], this.color[2], 1);
-    this.pyramidMaterial.setSpecular(0.1, 0.1, 0.1, 1);
-    this.pyramidMaterial.setShininess(10.0);
-    this.pyramidMaterial.loadTexture('images/leaf.jpg');
-    this.pyramidMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
     // Create multiple pyramids for the crown
     for (let i = 0; i < numPyramids; i++) {

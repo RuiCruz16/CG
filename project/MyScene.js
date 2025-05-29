@@ -49,9 +49,6 @@ export class MyScene extends CGFscene {
     this.earthMaterial.setShininess(10.0);
     this.earthMaterial.loadTexture('images/earth.jpg');
 
-    // Textures
-    this.textureGrass =  new CGFtexture(this, 'images/grass.png'); 
-
     this.setUpdatePeriod(50);
 
     //Initialize scene objects
@@ -62,16 +59,11 @@ export class MyScene extends CGFscene {
     this.tree = new MyTree(this, 30, 5, Math.PI/4, 'z', [0.0, 1.0, 0.0]);
     this.forest = new MyForest(this, 4, 4, 20);
     this.helicopter = new MyHeli(this);
-
-
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
-
     this.fire = new MyFire(this, 4, 4, 20, 0.8);
-
     this.lake = new MyLake(this, -50, -100, 50);
 
     this.waterDrop = null;
-
     this.displayNormals = false;
     this.speedFactor = 1;
   }
