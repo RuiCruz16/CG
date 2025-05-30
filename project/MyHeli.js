@@ -51,7 +51,7 @@ export class MyHeli extends CGFobject {
     this.tilt = 0;
     
     this.heliState = HeliState.LANDED;
-    this.cruiseAltitude = 70;
+    this.cruiseAltitude = 80;
     this.altitude = this.y;
 
     this.targetAltitude = this.y;

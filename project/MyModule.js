@@ -186,7 +186,7 @@ export class MyModule extends CGFobject {
   update(t) {
     if (!this.heliport || !this.scene.helicopter) return;
 
-    const timeFactor = (t % 1000) / 1000;
+    const timeFactor = (t % 2000) / 2000;
     
     const state = this.scene.helicopter.heliState;
     let maneuverType = 0;

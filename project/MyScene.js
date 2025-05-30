@@ -61,7 +61,7 @@ export class MyScene extends CGFscene {
     this.helicopter = new MyHeli(this);
     this.building = new MyBuilding(this, 100, 3, 2, 'images/window.jpg', [1, 1, 1, 1]);
     this.fire = new MyFire(this, 4, 4, 20, 0.8);
-    this.lake = new MyLake(this, -50, -100, 50);
+    this.lake = new MyLake(this, -75, -100, 100);
 
     this.waterDrop = null;
     this.displayNormals = false;
@@ -265,10 +265,6 @@ export class MyScene extends CGFscene {
 
     this.pushMatrix();
       this.forest.display(); // Display the forest of trees
-    this.popMatrix();
-
-    this.pushMatrix();
-      //this.tree.display(); // Display the tree
     this.popMatrix();
 
     this.pushMatrix();

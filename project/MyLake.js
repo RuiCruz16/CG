@@ -57,7 +57,7 @@ export class MyLake extends CGFobject {
     display() {
         this.scene.pushMatrix();
         
-            this.scene.translate(this.x, 0, this.z);
+            this.scene.translate(this.x, 0.1, this.z);
             
             this.waterTex.apply();
             super.display();
