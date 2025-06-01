@@ -11,16 +11,19 @@ import { MyLake } from './MyLake.js';
 import { MyWaterDrop } from './MyWaterDrop.js';
 
 /**
- * MyScene
- * @constructor
+ * MyScene class
+ * Main scene controller that manages the entire firefighting simulation.
+ * Handles scene setup, object creation, user input, physics updates and rendering of the complete 3D environment.
  */
 export class MyScene extends CGFscene {
   constructor() {
     super();
   }
+
   init(application) {
     super.init(application);
 
+    // Set up camera and lights
     this.initCameras();
     this.initLights();
 
@@ -34,6 +37,7 @@ export class MyScene extends CGFscene {
 
     this.enableTextures(true);
 
+    // Create and configure material for the ground plane
     this.planeMaterial = new CGFappearance(this);
     this.planeMaterial.setAmbient(0.1, 0.1, 0.1, 1);
     this.planeMaterial.setDiffuse(0.9, 0.9, 0.9, 1);
@@ -42,6 +46,7 @@ export class MyScene extends CGFscene {
     this.planeMaterial.loadTexture('images/grass.png');
     //this.planeMaterial.setTextureWrap('REPEAT', 'REPEAT');
 
+    // Create and configure material for the earth sphere
     this.earthMaterial = new CGFappearance(this);
     this.earthMaterial.setAmbient(0.1, 0.1, 0.1, 1);
     this.earthMaterial.setDiffuse(0.9, 0.9, 0.9, 1);
@@ -68,6 +73,10 @@ export class MyScene extends CGFscene {
     this.speedFactor = 1;
   }
 
+  /**
+   * Configure scene lighting
+   * Sets up a single white light source positioned at (200,200,200)
+   */
   initLights() {
     this.lights[0].setPosition(200, 200, 200, 1);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
@@ -75,6 +84,10 @@ export class MyScene extends CGFscene {
     this.lights[0].update();
   }
 
+  /**
+   * Configure scene camera
+   * Sets up a perspective camera with 60-degree field of view
+   */
   initCameras() {
     this.camera = new CGFcamera(
       Math.PI / 3,
@@ -105,7 +118,12 @@ export class MyScene extends CGFscene {
   }
   */
 
+  /**
+   * Process keyboard input for helicopter control and simulation interaction
+   * Handles movement, water collection, and special actions
+   */
   checkKeys() {
+    // Helicopter movement controls - WASD keys
     if (this.gui.isKeyPressed("KeyW")) {
       this.helicopter.accelerate(0.5 * this.speedFactor);
     }
@@ -122,6 +140,7 @@ export class MyScene extends CGFscene {
     if (this.gui.isKeyPressed("KeyD"))
       this.helicopter.turn(-0.1 * this.speedFactor);
   
+    // Reset helicopter position and state
     if (this.gui.isKeyPressed("KeyR")) {
       this.helicopter.x = 100;
       this.helicopter.z = -100;
@@ -136,6 +155,7 @@ export class MyScene extends CGFscene {
       this.helicopter.heliState = HeliState.LANDED;
     }
 
+    // Take off
     if (this.gui.isKeyPressed("KeyP")) {
       if (this.helicopter.heliState === HeliState.LANDING) {
         return;
@@ -148,6 +168,7 @@ export class MyScene extends CGFscene {
       this.helicopter.targetAltitude = this.helicopter.cruiseAltitude;
     }
     
+    // Land/refill water
     if (this.gui.isKeyPressed("KeyL")) {
       if (this.helicopter.heliState === HeliState.TAKING_OFF || this.helicopter.heliState === HeliState.REFFILLING) {
         return;
@@ -174,6 +195,7 @@ export class MyScene extends CGFscene {
       }
     }
 
+    // Drop water on fire
     if (this.gui.isKeyPressed("KeyO")) {
       if (this.helicopter.heliState === HeliState.FLYING && 
         this.helicopter.bucketIsFull && 
@@ -190,9 +212,13 @@ export class MyScene extends CGFscene {
   }
 
   update(t) {
+    // Process keyboard input
     this.checkKeys();
+
+    // Update helicopter physics and animation
     this.helicopter.update(this.updatePeriod);
     
+    // Update water drop animation if active
     if (this.waterDrop !== null) {
       this.waterDrop.update(this.updatePeriod);
       
@@ -201,8 +227,10 @@ export class MyScene extends CGFscene {
       }
     }
 
+    // Update forest fire simulation
     this.fire.update(t);
 
+    // Update building/heliport animations
     if (this.building) {
       this.building.update(t);
     }
@@ -244,34 +272,41 @@ export class MyScene extends CGFscene {
 
     this.setDefaultAppearance();
 
+    // Draw water drop effect if active
     this.pushMatrix();
       if (this.waterDrop !== null) {
         this.waterDrop.display();
       }
     this.popMatrix();
 
+    // Draw lake
     this.pushMatrix();
       this.lake.display(); // Display the lake
     this.popMatrix();
     
+    // Draw fire
     this.pushMatrix();
       this.fire.display();
     this.popMatrix();
 
+    // Draw heicopter
     this.pushMatrix();
       //this.translate(100, 48, -100);
       this.helicopter.display(); // Display the helicopter
     this.popMatrix();
 
+    // Draw forest
     this.pushMatrix();
       this.forest.display(); // Display the forest of trees
     this.popMatrix();
 
+    // Draw building
     this.pushMatrix();
       this.translate(100, 0, -100);
       this.building.display();
     this.popMatrix();
 
+    // Draw ground plane
     this.pushMatrix();
       this.scale(400, 1, 400);
       this.rotate(-Math.PI / 2, 1, 0, 0);
@@ -279,11 +314,7 @@ export class MyScene extends CGFscene {
       this.plane.display();
     this.popMatrix();
 
-    this.pushMatrix();
-      this.earthMaterial.apply(); // Apply the texture to the sphere!
-      //this.sphere.display();
-    this.popMatrix();
-
+    // Draw skyboc panorama
     this.panorama.display(); // Display the panorama
 
   }

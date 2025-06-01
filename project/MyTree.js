@@ -2,16 +2,12 @@ import { CGFobject } from '../lib/CGF.js';
 import { MyCone } from './MyCone.js';
 import { MyPyramid } from './MyPyramid.js';
 
-/**
+/*
  * MyTree
- * @constructor
- * @param scene - Reference to the scene
- * @param trunkHeight - Height of the tree trunk (cone)
- * @param trunkRadius - Base radius of the tree trunk (cone)
- * @param tiltAngle - Tilt angle of the tree
- * @param rotationAxis - Axis of rotation for the tree
- * @param color - Color of the tree
- */
+ * Creates a 3D tree object with a trunk and a crown made of pyramids.
+ * Each tree has customizable properties such as height, radius, tilt angle,
+ * color, and materials
+*/
 export class MyTree extends CGFobject {
   constructor(scene, trunkHeight, trunkRadius, tiltAngle, rotationAxis, color, trunkMaterial, leafMaterial) {
     super(scene);
@@ -28,6 +24,7 @@ export class MyTree extends CGFobject {
         this.color = color;
     }
 
+    // Store materials for the trunk and leaves
     this.trunkMaterial = trunkMaterial;
     this.pyramidMaterial = leafMaterial;
 
@@ -35,23 +32,26 @@ export class MyTree extends CGFobject {
   }
 
   initBuffers() {
-    // Tree trunk (cone)
+    // Create the trunk using a cone
     this.trunk = new MyCone(this.scene, 20, 1, this.trunkHeight, this.trunkRadius);
 
-    // Tree crown (pyramids)
+    // Create array to store the pyramids for the crown
     this.pyramids = [];
-    let treetop = this.trunkHeight * 0.8;
-    let trunkHeightWithoutPyramids = this.trunkHeight - treetop;
-    let numPyramids = Math.floor(this.trunkHeight / 2);
-    let pyramidHeight = treetop / numPyramids; // Adjust height based on number of pyramids
-    let pyramidBaseSize = this.trunkRadius * 2; // Base size of the pyramid
 
-    // Create multiple pyramids for the crown
+    // Calculate crown properties
+    let treetop = this.trunkHeight * 0.8; //Crown takes up 80% of the trunk height
+    let trunkHeightWithoutPyramids = this.trunkHeight - treetop;  // Height of the trunk without the crown
+    let numPyramids = Math.floor(this.trunkHeight / 2); // Number of pyramids based on trunk height
+    let pyramidHeight = treetop / numPyramids; // Height of each pyramid in the crown
+    let pyramidBaseSize = this.trunkRadius * 2; // Width of the base (starts twice the trunk radius)
+
+    // Create multiple pyramids fwith decreasing size for the crown
     for (let i = 0; i < numPyramids; i++) {
         this.pyramids.push(new MyPyramid(this.scene, 6, pyramidHeight, pyramidBaseSize));
-        pyramidBaseSize *= 0.9;
+        pyramidBaseSize *= 0.9; // Each pyramid is 90% the size of the previous one
     }
 
+    // Store calculated values use later in display
     this.numPyramids = numPyramids;
     this.trunkHeightWithoutPyramids = trunkHeightWithoutPyramids;
     this.pyramidBaseSize = pyramidBaseSize;
@@ -59,34 +59,35 @@ export class MyTree extends CGFobject {
   }
 
   display() {
-    // Apply tilt transformation
+    // Apply tilt transformation to the tree
     this.scene.pushMatrix();
+        // Apply rotation based on the specified axis
         if (this.rotationAxis === 'x') {
-            this.scene.rotate(this.tiltAngle, 1, 0, 0); 
+            this.scene.rotate(this.tiltAngle, 1, 0, 0); // Tilt around the X-axis
         } else if (this.rotationAxis === 'z') {
             this.scene.rotate(this.tiltAngle, 0, 0, 1); // Tilt around the Z-axis
         }
 
-    // Draw the trunk (cone)
-    this.scene.pushMatrix();
-        this.trunkMaterial.apply();
-        this.trunk.display();
-    this.scene.popMatrix();
-
-    // Draw the pyramids (crown)
-    let yOffset = this.trunkHeightWithoutPyramids;
-    for (let i = 0; i < this.numPyramids; i++) {
+      // Draw the trunk with its material
       this.scene.pushMatrix();
-        
-        this.scene.translate(0, yOffset, 0);  // Stack pyramids on top of each other
-        this.scene.scale(1, 2, 1);
-        this.pyramidMaterial.apply();
-        this.pyramids[i].display();
+          this.trunkMaterial.apply();
+          this.trunk.display();
       this.scene.popMatrix();
 
-      // Move the next pyramid higher up
-      yOffset += this.pyramidHeight;
-    }
-    this.scene.popMatrix(); // Pop the tilt transformation
+      // Draw the pyramids that form the crown
+      let yOffset = this.trunkHeightWithoutPyramids;  // Start stacking pyramids at the top of the trunk
+      for (let i = 0; i < this.numPyramids; i++) {
+        this.scene.pushMatrix();
+          
+          this.scene.translate(0, yOffset, 0);  // Position each pyramid layer
+          this.scene.scale(1, 2, 1);  // Stretch vertically for a more tree-like appearance
+          this.pyramidMaterial.apply(); // Apply leaf material
+          this.pyramids[i].display(); 
+        this.scene.popMatrix();
+
+        // Move the next pyramid higher up
+        yOffset += this.pyramidHeight;
+      }
+    this.scene.popMatrix();
   }
 }
