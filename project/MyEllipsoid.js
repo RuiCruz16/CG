@@ -2,13 +2,8 @@ import { CGFobject } from '../lib/CGF.js';
 
 /**
  * MyEllipsoid
- * @constructor
- * @param scene - Reference to MyScene object
- * @param slices - Number of divisions around the Y axis (circular divisions)
- * @param stacks - Number of divisions along the Y axis (vertical divisions)
- * @param radiusX - Radius along the X-axis (horizontal stretch)
- * @param radiusY - Radius along the Y-axis (vertical stretch)
- * @param radiusZ - Radius along the Z-axis (depth stretch)
+ * Creates a parametric ellipsoid with different scaling factors for each axis
+ * Used in the project for the helicopter's main body and various connecting components
  */
 export class MyEllipsoid extends CGFobject {
     constructor(scene, slices, stacks, radiusX, radiusY, radiusZ) {
@@ -32,15 +27,16 @@ export class MyEllipsoid extends CGFobject {
     
         // Loop through stacks and slices to generate vertices and normals
         for (var i = 0; i <= this.stacks; i++) {
-            var theta = i * betaAng; // Stack angle from 0 to PI
+            var theta = i * betaAng; // Stack angle from 0 (top) to PI (bottom)
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
     
             for (var j = 0; j <= this.slices; j++) {
-                var phi = j * alphaAng; // Slice angle
+                var phi = j * alphaAng; // Slice angle around the ellipsoid
                 var sinPhi = Math.sin(phi);
                 var cosPhi = Math.cos(phi);
     
+                // Position using parametric equation of ellipsoid
                 var x = this.radiusX * sinTheta * cosPhi;
                 var y = this.radiusY * sinTheta * sinPhi;
                 var z = this.radiusZ * cosTheta;
@@ -59,9 +55,10 @@ export class MyEllipsoid extends CGFobject {
                 this.normals.push(nx, ny, nz);
                 this.texCoords.push(j / this.slices, i / this.stacks);
     
+                // Triangle indices
                 if (i < this.stacks && j < this.slices) {
-                    var current = i * (this.slices + 1) + j;
-                    var next = current + this.slices + 1;
+                    var current = i * (this.slices + 1) + j; // Current vertex
+                    var next = current + this.slices + 1; // Vertex in next row
     
                     this.indices.push(current, next, current + 1);
                     this.indices.push(current + 1, next, next + 1);

@@ -1,5 +1,10 @@
 import { CGFobject } from '../lib/CGF.js';
 
+/**
+ * MyWindow class
+ * Represents a window used in building facades
+ * Creates a textured quad at a specific position (xPos, yPos, zPos) with configurable dimensions (xSpacing, ySpacing)
+ */
 export class MyWindow extends CGFobject {
   constructor(scene, appearance, xPos, yPos, zPos, xSpacing, ySpacing) {
     super(scene);

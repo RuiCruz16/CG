@@ -1,11 +1,16 @@
 import { CGFobject, CGFappearance, CGFtexture } from '../lib/CGF.js';
 import { MyModule } from './MyModule.js';
 
+/**
+ * MyBuilding class
+ * Creates a fire station building composed of three modules:
+ * a taller central module (with heliport) and two smaller side modules
+ */
 export class MyBuilding extends CGFobject {
   constructor(scene, width, floors, windowsPerFloor, windowTexture, buildingColor) {
     super(scene);
-    this.width = width;
-    this.floors = floors;
+    this.width = width; // Total width of the building
+    this.floors = floors; // Number of floors for the side modules (central module gets +1)
     this.windowsPerFloor = windowsPerFloor;
     this.windowTexture = windowTexture;
     this.buildingColor = buildingColor;
@@ -14,10 +19,12 @@ export class MyBuilding extends CGFobject {
     this.sideModuleWidth = 0.75 * this.centerModuleWidth;
     this.heightPerFloor = this.centerModuleWidth * 0.3;
 
+    // Load textures for building elements
     this.windowTextureObj = new CGFtexture(scene, windowTexture);
     this.doorTexture = new CGFtexture(scene, 'images/door.jpg');
     this.letreiroTexture = new CGFtexture(scene, 'images/letreiro.jpg');
     
+    // Create material appearances
     this.windowAppearance = new CGFappearance(scene);
     this.windowAppearance.setTexture(this.windowTextureObj);
     
@@ -35,10 +42,11 @@ export class MyBuilding extends CGFobject {
   }
 
   createModules() {
+    // Create central module (with heliport)
     this.centerModule = new MyModule(
       this.scene, 
       this.centerModuleWidth, 
-      this.floors + 1, 
+      this.floors + 1, // Central module has an extra floor
       this.windowsPerFloor, 
       this.heightPerFloor, 
       this.windowAppearance,
@@ -48,6 +56,7 @@ export class MyBuilding extends CGFobject {
       true
     );
     
+    // Create side modules
     this.rightModule = new MyModule(
       this.scene, 
       this.sideModuleWidth, 
@@ -77,7 +86,7 @@ export class MyBuilding extends CGFobject {
 
   update(t) {
     if (this.centerModule) {
-      this.centerModule.update(t);
+      this.centerModule.update(t); // heliport animations
     }
   }
 
@@ -93,7 +102,7 @@ export class MyBuilding extends CGFobject {
 
     this.scene.pushMatrix();
         this.scene.translate(-(this.centerModuleWidth / 2 + this.sideModuleWidth / 2), 0, 0);
-        this.rightModule.display();
+        this.leftModule.display();
     this.scene.popMatrix();
   }
 }

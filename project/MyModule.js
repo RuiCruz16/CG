@@ -4,25 +4,32 @@ import { MyModuleTexture } from './MyModuleTexture.js';
 import { HeliState } from './MyHeli.js';
 import { MySphere } from './MySphere.js';
 
+/**
+ * MyModule class
+ * Represents a single building block used in MyBuilding
+ * Can be a central module (with heliport, door, and sign) or a side module (with only windows)
+ */
 export class MyModule extends CGFobject {
   constructor(scene, width, floors, windowsPerFloor, heightPerFloor, windowAppearance, doorAppearance, letreiroAppearance, buildingColor, isCenter) {
     super(scene);
-    this.width = width;
-    this.floors = floors;
-    this.windowsPerFloor = windowsPerFloor;
-    this.heightPerFloor = heightPerFloor;
+    this.width = width; // Width of this module
+    this.floors = floors; // Number of floors
+    this.windowsPerFloor = windowsPerFloor; // Number of windows per floor (front face)
+    this.heightPerFloor = heightPerFloor; // Height of each floor
     this.windowAppearance = windowAppearance;
     this.doorAppearance = doorAppearance;
     this.letreiroAppearance = letreiroAppearance;
     this.buildingColor = buildingColor;
-    this.isCenter = isCenter;
+    this.isCenter = isCenter; // Whether this is the central module
 
+    // Appearance based on building color
     this.appearance = new CGFappearance(scene);
     this.appearance.setAmbient(buildingColor[0] * 0.8, buildingColor[1] * 0.8, buildingColor[2] * 0.8, 1.0);
     this.appearance.setDiffuse(buildingColor[0] * 0.8, buildingColor[1] * 0.8, buildingColor[2] * 0.8, 1.0);
     this.appearance.setSpecular(0.5, 0.5, 0.5, 1.0);
     this.appearance.setShininess(10.0);
 
+    // If center, prepare shaders and textures for heliport and lights
     if (isCenter) {
       this.lightShader = new CGFshader(scene.gl, 'shaders/heliportLight.vert', 'shaders/heliportLight.frag');
       
@@ -46,8 +53,8 @@ export class MyModule extends CGFobject {
       this.heliportShader = new CGFshader(scene.gl, 'shaders/heliport.vert', 'shaders/heliport.frag');
 
       this.heliportShader.setUniformsValues({
-        uSampler: 0,
-        uSamplerAlt: 1,
+        uSampler: 0, // Default heliport texture
+        uSamplerAlt: 1, // Alternative texture for animation
         uTimeFactor: 0.0,
         uManeuverType: 0
       });
@@ -135,9 +142,10 @@ export class MyModule extends CGFobject {
 
     for (let i = 0; i < this.floors; i++) {
       for (let j = 0; j < this.windowsPerFloor; j++) {
+        // Front door and sign for central module at ground level
         if (i == 0 && this.isCenter) {
           const yPosDoor = this.heightPerFloor / 3;
-          const zPos = this.width / 2 + 0.1;
+          const zPos = this.width / 2 + 0.1; // + 0.1 to prevent z-fighting with module front face
           const xVariationDoor = (this.width/2) * 0.15;
           const yVariationDoor = this.heightPerFloor / 3;
           this.elements.push(new MyModuleTexture(this.scene, this.doorAppearance, 0, yPosDoor, zPos, xVariationDoor, yVariationDoor, false));
@@ -148,20 +156,22 @@ export class MyModule extends CGFobject {
           this.elements.push(new MyModuleTexture(this.scene, this.letreiroAppearance, 0, yPosSign, zPos, xVariationSign, yVariationSign, false));
           break;
         } else {
+          // If last floor and center, create heliport and lights
           if (i == this.floors - 1 && this.isCenter) {
             const Variation = (this.width/2) * 0.70;
             this.heliport = new MyModuleTexture(this.scene, 'images/heliport.jpg', 0, this.heightPerFloor * this.floors + 0.1, 0, Variation, Variation, true);
 
-            const lightSize = 0.05 * this.width;
+            const lightSize = 0.05 * this.width; // Define the size of the heliport lights
             const lightPosY = this.heightPerFloor * this.floors;
             
             const positions = [
-              [-Variation, lightPosY, -Variation],
-              [Variation, lightPosY, -Variation],
-              [-Variation, lightPosY, Variation],
-              [Variation, lightPosY, Variation]
+              [-Variation, lightPosY, -Variation], // Back-left
+              [Variation, lightPosY, -Variation], // Back-right
+              [-Variation, lightPosY, Variation], // Front-left
+              [Variation, lightPosY, Variation] // Front-right
             ];
             
+            // Create a light object (sphere) for each corner
             this.heliportLights = [];
             for (let pos of positions) {
               this.heliportLights.push({
@@ -172,9 +182,10 @@ export class MyModule extends CGFobject {
             }
           }
           
+          // Regular window
           const xPos = -this.width / 2 + (j + 0.5) * windowWidth;
           const yPos = i * this.heightPerFloor + (this.heightPerFloor / 2);
-          const zPos = this.width / 2 + 0.1;
+          const zPos = this.width / 2 + 0.1; // Same case as the 0.1 above
           const xVariation = windowWidth / 5;
           const yVariation = this.heightPerFloor / 4;
           this.elements.push(new MyWindow(this.scene, this.windowAppearance, xPos, yPos, zPos, xVariation, yVariation));
@@ -183,9 +194,11 @@ export class MyModule extends CGFobject {
     }
   }
 
+  // Updates heliport animation based on time and helicopter state
   update(t) {
     if (!this.heliport || !this.scene.helicopter) return;
 
+    // Loops from 0 to 1 every 2 seconds
     const timeFactor = (t % 2000) / 2000;
     
     const state = this.scene.helicopter.heliState;
@@ -225,6 +238,7 @@ export class MyModule extends CGFobject {
       this.scene.popMatrix();
     }
 
+    // If this is the central module, draw heliport and lights
     if (this.heliport) {
       const currentShader = this.scene.activeShader;
       
@@ -232,6 +246,7 @@ export class MyModule extends CGFobject {
       
       this.heliportTexture.bind(0);
       
+      // Bind appropriate texture based on helicopter state
       if (this.scene.helicopter.heliState === HeliState.TAKING_OFF) {
         this.heliportUpTexture.bind(1);
       } else if (this.scene.helicopter.heliState === HeliState.LANDING) {

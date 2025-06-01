@@ -1,11 +1,16 @@
 import { CGFobject } from "../lib/CGF.js";
 
+/**
+ * MyRectangularPrism class
+ * Creates a 3D rectangular prism with configurable dimensions
+ * Used for building the rotors of the helicopter
+ */
 export class MyRectangularPrism extends CGFobject {
     constructor(scene, length, height, width) {
         super(scene);
-        this.length = length;
-        this.height = height;
-        this.width = width;
+        this.length = length; // X dimension
+        this.height = height; // Y dimension
+        this.width = width; // Z dimension
         this.initBuffers();
     }
 
@@ -28,6 +33,7 @@ export class MyRectangularPrism extends CGFobject {
             halfLength, -halfHeight, halfWidth,    // Vertex 5
             halfLength, halfHeight, halfWidth,     // Vertex 6
             -halfLength, halfHeight, halfWidth,     // Vertex 7
+            // Duplicated vertices for different normal directions
             -halfLength, -halfHeight, -halfWidth,  // Vertex 0
             halfLength, -halfHeight, -halfWidth,   // Vertex 1
             halfLength, halfHeight, -halfWidth,    // Vertex 2

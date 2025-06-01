@@ -1,18 +1,15 @@
 import {CGFobject} from '../lib/CGF.js';
+
 /**
- * MyCylinder
- * @constructor
- * @param scene - Reference to MyScene object
- * @param slices - Number of divisions around the Y axis
- * @param stacks - Number of divisions along the height
- * @param height - Height of the cylinder
- * @param radius - Radius of the cylinder
+ * MyCylinderWTopCap
+ * Creates a parametric cylinder with only the bottom cap (no top cap)
+ * Same as MyCylinder but without the top cap, used in the helicopter's water bucket
  */
 export class MyCylinderWTopCap extends CGFobject {
     constructor(scene, slices, stacks, height, radius) {
         super(scene);
-        this.slices = slices;
-        this.stacks = stacks;
+        this.slices = slices; // Angular divisions (around the cylinder)
+        this.stacks = stacks; // Vertical divisions (along the height)
         this.height = height || 1; // Default height of 1
         this.radius = radius || 1; // Default radius of 1
         this.initBuffers();
@@ -24,12 +21,13 @@ export class MyCylinderWTopCap extends CGFobject {
         this.normals = [];
         this.texCoords = [];
 
-        let angle = 2 * Math.PI / this.slices;
+        let angle = 2 * Math.PI / this.slices; // Angular step between slices
         let vertexCount = 0;
 
         // Generate the cylinder sides
         for (let j = 0; j <= this.stacks; j++) {
             let z = (j / this.stacks) * this.height;
+            // Create vertices around the circumference at current height
             for (let i = 0; i <= this.slices; i++) {
                 let x = this.radius * Math.cos(i * angle);
                 let y = this.radius * Math.sin(i * angle);
@@ -45,10 +43,10 @@ export class MyCylinderWTopCap extends CGFobject {
         // Generate indices for the cylinder sides
         for (let j = 0; j < this.stacks; j++) {
             for (let i = 0; i < this.slices; i++) {
-                let current = i + j * (this.slices + 1);
-                let next = current + 1; // Because we added one extra vertex per row
-                let above = current + (this.slices + 1);
-                let aboveNext = above + 1;
+                let current = i + j * (this.slices + 1); // Current vertex
+                let next = current + 1; // Next vertex in same stack
+                let above = current + (this.slices + 1); // Vertex above current
+                let aboveNext = above + 1; // Vertex above and next
         
                 this.indices.push(current, next, above);
                 this.indices.push(next, aboveNext, above);
@@ -73,12 +71,12 @@ export class MyCylinderWTopCap extends CGFobject {
             vertexCount++;
         }
 
-        // Generate the bottom cap indices
+        // Generate the bottom cap indices (triangles from center to perimeter)
         for (let i = 0; i < this.slices; i++) {
             this.indices.push(
-                bottomCenterIndex,
-                bottomCenterIndex + i + 2,
-                bottomCenterIndex + i + 1
+                bottomCenterIndex, // Center point
+                bottomCenterIndex + i + 2, // Next perimeter point
+                bottomCenterIndex + i + 1 // Current perimeter point
             );
         }
 

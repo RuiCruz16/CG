@@ -1,6 +1,10 @@
 import { CGFobject, CGFappearance } from '../lib/CGF.js';
 import { MySphere } from './MySphere.js';
 
+/**
+ * MyWaterDrop class
+ * Represents a water drop used to extinguish forest fire, using a water sphere
+ */
 export class MyWaterDrop extends CGFobject {
     constructor(scene, x, y, z) {
         super(scene);
@@ -11,11 +15,11 @@ export class MyWaterDrop extends CGFobject {
         this.z = z;
         
         this.velocity = 0;
-        this.acceleration = 10;
-        this.active = true;
+        this.acceleration = 10; // Gravitational acceleration
+        this.active = true; // Flag to control if the drop is still active
         
-        this.radius = 2;
-        this.hasReachedGround = false;
+        this.radius = 2; // Sphere size
+        this.hasReachedGround = false; // Flag to track ground collision
         
         this.initBuffers();
     }
@@ -34,15 +38,18 @@ export class MyWaterDrop extends CGFobject {
     update(deltaTime) {
         if (!this.active) return;
         
+        // Convert milliseconds to seconds
         const dt = deltaTime / 1000;
         
         this.velocity += this.acceleration * dt;
         this.y -= this.velocity * dt;
         
+        // Check for collision with ground level
         if (this.y < 1) {
             this.y = 0.5;
             this.hasReachedGround = true;
             
+            // Check if the drop has landed on fire and extinguish it
             if (this.scene.fire && this.scene.fire.isPointAboveFire(this.x, this.z)) {
                 this.scene.fire.extinguish();
             }

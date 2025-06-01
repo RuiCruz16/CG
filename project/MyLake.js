@@ -1,5 +1,10 @@
 import { CGFobject, CGFappearance, CGFtexture } from '../lib/CGF.js';
 
+/**
+ * MyLake class
+ * Creates a water body represented as a textured quad with reflective properties
+ * Used to add the lake to the scene environment
+ */
 export class MyLake extends CGFobject {
     constructor(scene, x, z, size) {
         super(scene);
@@ -24,11 +29,12 @@ export class MyLake extends CGFobject {
     }
     
     initBuffers() {
+        // Slightly raised above ground level
         this.vertices = [
-            -this.size/2, 0.1, -this.size/2,  // Slightly raised above ground level
-            this.size/2, 0.1, -this.size/2,
-            this.size/2, 0.1, this.size/2,
-            -this.size/2, 0.1, this.size/2
+            -this.size/2, 0.1, -this.size/2, // Bottom-left corner
+            this.size/2, 0.1, -this.size/2, // Bottom-right corner
+            this.size/2, 0.1, this.size/2, // Top-right corner
+            -this.size/2, 0.1, this.size/2 // Top-left corner
         ];
         
         this.indices = [

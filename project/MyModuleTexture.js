@@ -1,9 +1,16 @@
 import { CGFobject, CGFtexture, CGFappearance } from '../lib/CGF.js';
 
+/**
+ * MyModuleTexture
+ * Creates a textured quad (rectangle)
+ * Used in MyBuilding for applying special textures like heliport,
+ * door, and the building signage
+ */
 export class MyModuleTexture extends CGFobject {
   constructor(scene, appearance, xPos, yPos, zPos, xSpacing, ySpacing, isCeiling) {
     super(scene);
     
+    // Handle both appearance object and texture path string
     if (typeof appearance === 'string') {
       const texture = new CGFtexture(scene, appearance);
       this.appearance = new CGFappearance(scene);
@@ -15,9 +22,9 @@ export class MyModuleTexture extends CGFobject {
     this.xPos = xPos;
     this.yPos = yPos;
     this.zPos  = zPos;
-    this.xSpacing = xSpacing;
-    this.ySpacing = ySpacing;
-    this.isCeiling = isCeiling;
+    this.xSpacing = xSpacing; // Half-width
+    this.ySpacing = ySpacing; // Half-height
+    this.isCeiling = isCeiling; // Orientation flag (vertical wall vs horizontal surface)
 
     this.initBuffers();
   }
@@ -25,10 +32,10 @@ export class MyModuleTexture extends CGFobject {
   initBuffers() {
     if(this.isCeiling) {
       this.vertices = [
-        this.xPos - this.xSpacing, this.yPos, this.zPos - this.ySpacing,
-        this.xPos + this.xSpacing, this.yPos, this.zPos - this.ySpacing,
-        this.xPos - this.xSpacing, this.yPos, this.zPos + this.ySpacing,
-        this.xPos + this.xSpacing, this.yPos, this.zPos + this.ySpacing
+        this.xPos - this.xSpacing, this.yPos, this.zPos - this.ySpacing, // Bottom-left
+        this.xPos + this.xSpacing, this.yPos, this.zPos - this.ySpacing, // Bottom-right
+        this.xPos - this.xSpacing, this.yPos, this.zPos + this.ySpacing, // Top-left
+        this.xPos + this.xSpacing, this.yPos, this.zPos + this.ySpacing // Top-right
       ];
     } else {
       this.vertices = [
@@ -59,6 +66,7 @@ export class MyModuleTexture extends CGFobject {
         0, 1, 0
       ];
     } else {
+      // Vertical surfaces
       this.normals = [
         1, 1, 1,
         1, 1, 1,
