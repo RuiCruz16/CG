@@ -6,17 +6,15 @@ precision highp float;
 attribute vec3 aVertexPosition;  // Position of each vertex in 3D space
 attribute vec2 aTextureCoord;    // Texture coordinates for mapping textures
 
-// Transformation matrices passed from application
-uniform mat4 uMVMatrix;   // Model-View matrix (combines model and camera transformations)
-uniform mat4 uPMatrix;    // Projection matrix (perspective/orthographic projection)
+// Transformation matrices
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
 
-// Output variables to pass to fragment shader
-varying vec2 vTextureCoord;  // Texture coordinates passed through
+varying vec2 vTextureCoord;
 
 void main() {    
-    // Transform vertex position from model space to clip space
     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
     
-    // Pass texture coordinates unchanged to fragment shader
+    // Pass texture coordinates to fragment shader
     vTextureCoord = aTextureCoord;
 }
